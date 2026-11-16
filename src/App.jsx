@@ -8,58 +8,62 @@ import {
 } from 'lucide-react';
 
 const places = [
-  { id: 1, name: 'قلعة صلاح الدين', city: 'القاهرة', category: 'تاريخي', tags: ['ثقافة', 'تاريخ'], rating: '4.9', distance: '2.4 كم', family: true, halal: false, accessible: true, image: 'https://images.unsplash.com/photo-1568322445389-f64ac2515020?auto=format&fit=crop&w=900&q=85', description: 'اكتشف واحدة من أبرز معالم القاهرة التاريخية وإطلالتها المميزة.' },
-  { id: 2, name: 'ممشى أهل مصر', city: 'القاهرة', category: 'ترفيهي', tags: ['عائلات', 'نزهات'], rating: '4.7', distance: '1.1 كم', family: true, halal: true, accessible: true, image: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=900&q=85', description: 'مساحة مفتوحة للتنزه والاستمتاع بإطلالة النيل.' },
-  { id: 3, name: 'المتحف القومي للحضارة', city: 'القاهرة', category: 'ثقافي', tags: ['ثقافة', 'تاريخ'], rating: '4.8', distance: '5.2 كم', family: true, halal: false, accessible: true, image: 'https://images.unsplash.com/photo-1565060169194-19fabf63012b?auto=format&fit=crop&w=900&q=85', description: 'رحلة بين فصول من تاريخ الحضارة المصرية.' },
-  { id: 4, name: 'حديقة العائلة', city: 'القاهرة', category: 'عائلي', tags: ['أطفال', 'عائلات'], rating: '4.5', distance: '8.0 كم', family: true, halal: true, accessible: false, image: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=900&q=85', description: 'اختيار مناسب لقضاء وقت ممتع مع الأطفال والعائلة.' }
+  { id: 1, name: 'جامع السلطان قابوس الأكبر', city: 'مسقط', category: 'ثقافي', tags: ['عمارة', 'ثقافة'], rating: '—', distance: 'مسقط', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=1000&q=85', description: 'معلم معماري بارز في مسقط، يتميز بتفاصيله الهادئة وفنونه الإسلامية. تحقّق من أوقات الزيارة وتعليمات الدخول قبل الذهاب.' },
+  { id: 2, name: 'سوق مطرح', city: 'مسقط', category: 'تراثي', tags: ['تسوق', 'تراث'], rating: '—', distance: 'مطرح', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=1000&q=85', description: 'أزقة سوق تقليدي مليئة بالمحلات والمنتجات المحلية، وتجربة قريبة من ذاكرة مسقط البحرية.' },
+  { id: 3, name: 'قلعة نزوى', city: 'نزوى', category: 'تاريخي', tags: ['تاريخ', 'عمارة'], rating: '—', distance: 'الداخلية', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?auto=format&fit=crop&w=1000&q=85', description: 'قلعة تاريخية شهيرة في قلب نزوى، تعكس جانبًا مهمًا من العمارة الدفاعية والتراث العُماني.' },
+  { id: 4, name: 'وادي شاب', city: 'صور', category: 'طبيعة', tags: ['مياه', 'مغامرة'], rating: '—', distance: 'جنوب الشرقية', family: false, nature: true, accessible: false, image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=85', description: 'وادي طبيعي معروف بمياهه ومناظره الجبلية. يتطلب الوصول إليه مشيًا، لذلك راجع حالة الطقس وإرشادات السلامة قبل الزيارة.' },
+  { id: 5, name: 'وادي دربات', city: 'صلالة', category: 'طبيعة', tags: ['طبيعة', 'عائلات'], rating: '—', distance: 'ظفار', family: true, nature: true, accessible: false, image: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=1000&q=85', description: 'مناظر طبيعية خضراء وشلالات موسمية في محافظة ظفار، وتختلف الأجواء والمشهد حسب الموسم.' },
+  { id: 6, name: 'قلعة خصب', city: 'خصب', category: 'تراثي', tags: ['تاريخ', 'ثقافة'], rating: '—', distance: 'مسندم', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1512632578888-169bbbc64f33?auto=format&fit=crop&w=1000&q=85', description: 'قلعة عُمانية تاريخية تطل على مشهد ساحلي في محافظة مسندم، وتقدم لمحة عن تاريخ المنطقة.' },
+  { id: 7, name: 'رمال الشرقية', city: 'بدية', category: 'طبيعة', tags: ['صحراء', 'تجارب محلية'], rating: '—', distance: 'شمال الشرقية', family: true, nature: true, accessible: false, image: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1000&q=85', description: 'كثبان رملية واسعة وتجربة صحراوية مميزة. اختر مزود خدمة مرخصًا واتبع إرشادات السلامة المحلية.' },
+  { id: 8, name: 'شاطئ المغسيل', city: 'صلالة', category: 'طبيعة', tags: ['شاطئ', 'طبيعة'], rating: '—', distance: 'ظفار', family: true, nature: true, accessible: false, image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=85', description: 'شاطئ معروف غرب صلالة بتكويناته الساحلية ونوافيره الطبيعية التي تظهر مع حركة البحر.' }
 ];
 
 const guides = [
-  { id: 1, name: 'سارة محمود', specialty: 'مرشدة تاريخية وثقافية', languages: 'العربية • الإنجليزية', rating: '4.9', price: 'من 450 ج.م / الجولة', initials: 'سم' },
-  { id: 2, name: 'عمر شريف', specialty: 'جولات القاهرة القديمة', languages: 'العربية • الإنجليزية • الفرنسية', rating: '4.8', price: 'من 500 ج.م / الجولة', initials: 'عش' },
-  { id: 3, name: 'ليلى حسن', specialty: 'تجارب عائلية ومحلية', languages: 'العربية • الإنجليزية', rating: '5.0', price: 'من 400 ج.م / الجولة', initials: 'لح' }
+  { id: 1, name: 'مرشد محلي تجريبي 01', specialty: 'جولات ثقافية في مسقط', languages: 'العربية • الإنجليزية', rating: '—', price: 'السعر عند تأكيد مقدم الخدمة', initials: 'عُ' },
+  { id: 2, name: 'مرشد محلي تجريبي 02', specialty: 'تراث نزوى والداخلية', languages: 'العربية • الإنجليزية', rating: '—', price: 'السعر عند تأكيد مقدم الخدمة', initials: 'ن' },
+  { id: 3, name: 'مرشد محلي تجريبي 03', specialty: 'طبيعة ظفار وصلالة', languages: 'العربية • الإنجليزية', rating: '—', price: 'السعر عند تأكيد مقدم الخدمة', initials: 'ظ' }
 ];
 
 const copy = {
   ar: {
-    explore: 'لا تزُر المكان... انتمِ إليه', guides: 'عِش المكان بعيون أهله', access: 'المكان له صوت... ونحن لغتك',
-    home: 'الرئيسية', discover: 'اكتشف', localGuides: 'المرشدون المحليون', inclusive: 'الوصول الشامل',
-    tagline: 'رحلتك أقرب إلى المكان وأهله', sub: 'اكتشف وجهات تناسبك، تعرّف على ثقافة المكان مع أهله، واستمتع بتجربة سفر ميسّرة للجميع.',
-    search: 'ابحث عن مدينة أو مكان...', start: 'ابدأ الاستكشاف', exploreTitle: 'أماكن تستحق أن تعيشها',
-    exploreSub: 'ترشيحات أولية تساعدك على اكتشاف المكان بطريقتك.', all: 'الكل', family: 'مناسب للعائلات',
-    halal: 'خيارات حلال', accessible: 'مهيأ للوصول', guidesTitle: 'اكتشف المكان مع أهله',
-    guidesSub: 'تعرّف على مرشدين محليين لتجربة أعمق وأكثر قربًا من ثقافة المكان.',
-    viewProfile: 'عرض الملف', book: 'اطلب حجزًا', accessTitle: 'السفر حق للجميع',
-    accessSub: 'نساعدك في العثور على أماكن أكثر جاهزية، ونوفر أدوات تواصل أولية لتقريب المسافات.',
-    mapTitle: 'خريطة الأماكن المهيأة', mapSub: 'استكشف الأماكن التي تتوفر بها تجهيزات تسهّل الحركة والوصول.',
-    communication: 'مساعد التواصل النصي والصوتي', communicationSub: 'اكتب العبارة التي تريد إيصالها، وسيحاول المتصفح قراءتها بصوت مسموع.',
+    explore: 'لا تزُر المكان... انتمِ إليه', guides: 'عِش عُمان بعيون أهلها', access: 'السفر للجميع... بلا حواجز',
+    home: 'الرئيسية', discover: 'اكتشف عُمان', localGuides: 'المرشدون المحليون', inclusive: 'الوصول الشامل',
+    tagline: 'عُمان أقرب مما تتخيّل', sub: 'من أزقة مسقط وأسواقها إلى جبال الحجر وخضرة ظفار؛ اكتشف عُمان مع أهلها وبالطريقة التي تناسبك.',
+    search: 'ابحث عن مدينة أو وجهة في عُمان...', start: 'ابدأ الاستكشاف', exploreTitle: 'وجهات عُمانية تستحق التجربة',
+    exploreSub: 'اكتشف مزيج عُمان من التراث والطبيعة والسواحل والصحراء.', all: 'كل الوجهات', family: 'مناسب للعائلات',
+    halal: 'خيارات الطعام الحلال', nature: 'طبيعة ومغامرات', accessible: 'معلومات الوصول', guidesTitle: 'اكتشف عُمان مع أهلها',
+    guidesSub: 'تعرّف على نماذج تجريبية لخدمات الإرشاد المحلي. لا تمثل هذه الملفات أشخاصًا حقيقيين أو حجوزات متاحة.',
+    viewProfile: 'عرض الملف', book: 'طلب تواصل تجريبي', accessTitle: 'تجربة سفر أكثر شمولًا',
+    accessSub: 'نعمل على توضيح معلومات الوصول واحتياجات الزوار، مع أدوات تواصل أولية.',
+    mapTitle: 'خريطة الوصول — نموذج توضيحي', mapSub: 'الخريطة الحالية رسم تجريبي وليست بيانات جغرافية مباشرة.',
+    communication: 'مساعد تحويل النص إلى صوت', communicationSub: 'اكتب العبارة وسيحاول المتصفح قراءتها بصوت مسموع.',
     typeHere: 'اكتب ما تريد قوله...', speak: 'استمع إلى العبارة', stop: 'إيقاف الصوت',
-    location: 'استخدم موقعي', locationHelp: 'السماح بالموقع يساعدنا على ترتيب النتائج حسب قربها منك.',
-    featured: 'اختيارات قريبة منك', categories: 'اكتشف حسب اهتمامك', history: 'تاريخ وثقافة', familyCat: 'عائلات وأطفال',
-    food: 'طعام حلال', accessibleCat: 'وصول ميسّر', rating: 'التقييم', distance: 'المسافة',
-    details: 'التفاصيل', demo: 'نسخة تجريبية', footer: 'رحلتك تبدأ بفهم المكان.', requestSent: 'تم تسجيل طلبك التجريبي.',
-    close: 'إغلاق', searchResults: 'نتائج الاستكشاف', noResults: 'لا توجد نتائج مطابقة. جرّب تغيير الفلاتر.',
-    filter: 'تصفية', language: 'English', verifiedNote: 'بيانات تجريبية — يلزم التحقق من المعلومات قبل الإطلاق.'
+    location: 'استخدم موقعي', locationHelp: 'يمكنك السماح بالموقع من جهازك؛ لا نستخدمه حاليًا لجلب أماكن حقيقية.',
+    featured: 'ابدأ من هنا', categories: 'تجارب عُمانية', history: 'تاريخ وثقافة', familyCat: 'عائلات وأطفال',
+    food: 'مطاعم ومقاهٍ', accessibleCat: 'وصول ميسّر', rating: 'التقييم', distance: 'المنطقة',
+    details: 'التفاصيل', demo: 'نسخة تجريبية', footer: 'رحلتك تبدأ بفهم المكان.', requestSent: 'تم تسجيل طلبك التجريبي فقط — لا يوجد حجز فعلي.',
+    close: 'إغلاق', searchResults: 'نتائج الاستكشاف', noResults: 'لا توجد نتائج مطابقة. جرّب تغيير البحث أو الفلاتر.',
+    filter: 'تصفية', language: 'English', verifiedNote: 'محتوى تعريفي أولي مستند إلى وجهات عُمانية معروفة؛ راجع الجهات الرسمية قبل الزيارة. التقييمات والتوافر غير متصلين.'
   },
   en: {
-    explore: 'Don’t just visit. Belong.', guides: 'See the place through local eyes', access: 'The place has a voice. We speak your language',
-    home: 'Home', discover: 'Discover', localGuides: 'Local guides', inclusive: 'Accessibility',
-    tagline: 'Travel closer to the place and its people', sub: 'Discover places that fit you, connect with local culture, and enjoy a more accessible travel experience.',
-    search: 'Search for a city or place...', start: 'Start exploring', exploreTitle: 'Places worth experiencing',
-    exploreSub: 'Starter recommendations to help you discover the destination your way.', all: 'All', family: 'Family-friendly',
-    halal: 'Halal options', accessible: 'Accessible', guidesTitle: 'Discover the place with locals',
-    guidesSub: 'Meet local guides for a deeper connection with the culture.',
-    viewProfile: 'View profile', book: 'Request booking', accessTitle: 'Travel is for everyone',
-    accessSub: 'Find more accessible places and use simple communication tools to bridge the gap.',
-    mapTitle: 'Accessible places map', mapSub: 'Explore places with facilities that can make movement and access easier.',
-    communication: 'Text-to-speech assistant', communicationSub: 'Type a phrase and let your browser read it aloud.',
+    explore: 'Don’t just visit. Belong.', guides: 'See Oman through local eyes', access: 'Travel without barriers',
+    home: 'Home', discover: 'Explore Oman', localGuides: 'Local guides', inclusive: 'Accessibility',
+    tagline: 'Oman is closer than you imagine', sub: 'From Muscat’s old souqs to the Hajar Mountains and green Dhofar, discover Oman at your own pace.',
+    search: 'Search an Omani city or destination...', start: 'Start exploring', exploreTitle: 'Omani destinations worth experiencing',
+    exploreSub: 'Discover Oman through its heritage, nature, coastline and desert.', all: 'All destinations', family: 'Family-friendly',
+    halal: 'Halal food options', nature: 'Nature & outdoors', accessible: 'Accessibility info', guidesTitle: 'Discover Oman with locals',
+    guidesSub: 'These are sample guide profiles for demonstration only, not real people or available bookings.',
+    viewProfile: 'View profile', book: 'Send demo request', accessTitle: 'A more inclusive travel experience',
+    accessSub: 'We aim to make accessibility information clearer and provide simple communication tools.',
+    mapTitle: 'Accessibility map — demo', mapSub: 'This illustration is not live geographic data.',
+    communication: 'Text-to-speech assistant', communicationSub: 'Type a phrase and your browser will try to read it aloud.',
     typeHere: 'Type what you want to say...', speak: 'Speak phrase', stop: 'Stop',
-    location: 'Use my location', locationHelp: 'Location access helps sort results by distance.',
-    featured: 'Places around you', categories: 'Explore by interest', history: 'History & culture', familyCat: 'Families & kids',
-    food: 'Halal food', accessibleCat: 'Accessible travel', rating: 'Rating', distance: 'Distance',
-    details: 'Details', demo: 'Prototype', footer: 'Your journey starts with understanding the place.', requestSent: 'Your demo request has been recorded.',
-    close: 'Close', searchResults: 'Discovery results', noResults: 'No matching places. Try changing the filters.',
-    filter: 'Filters', language: 'العربية', verifiedNote: 'Demo data — all information must be verified before launch.'
+    location: 'Use my location', locationHelp: 'You can grant location permission; it is not yet used to fetch real places.',
+    featured: 'Start here', categories: 'Omani experiences', history: 'History & culture', familyCat: 'Families & kids',
+    food: 'Restaurants & cafes', accessibleCat: 'Accessible travel', rating: 'Rating', distance: 'Region',
+    details: 'Details', demo: 'Prototype', footer: 'Your journey starts with understanding the place.', requestSent: 'Demo request noted only — no real booking was made.',
+    close: 'Close', searchResults: 'Discovery results', noResults: 'No matching destinations. Try changing your search or filters.',
+    filter: 'Filters', language: 'العربية', verifiedNote: 'Introductory destination content based on known Omani places; verify with official sources before visiting. Ratings and availability are not live.'
   }
 };
 
@@ -79,7 +83,7 @@ function App() {
 
   const filteredPlaces = useMemo(() => places.filter(p => {
     const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'halal' && p.halal) || (filter === 'accessible' && p.accessible);
+    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'accessible' && p.accessible);
     return matchesQuery && matchesFilter;
   }), [query, filter]);
 
@@ -166,7 +170,7 @@ function App() {
           <div className="filter-panel">
             <div className="search-field"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder={t.search}/></div>
             <div className="filter-chips">
-              {[['all',t.all],['family',t.family],['halal',t.halal],['accessible',t.accessible]].map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'chip selected' : 'chip'}>{label}</button>)}
+              {[['all',t.all],['family',t.family],['nature',t.nature],['accessible',t.accessible]].map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'chip selected' : 'chip'}>{label}</button>)}
             </div>
           </div>
           <div className="results-caption"><span><SlidersHorizontal size={16}/>{t.searchResults}</span><small>{filteredPlaces.length} {rtl ? 'أماكن' : 'places'}</small></div>
@@ -199,7 +203,7 @@ function App() {
 }
 
 function PlaceGrid({items, t, favorites, toggleFavorite, onSelect}) {
-  return <div className="place-grid">{items.map(p => <article className="place-card" key={p.id}><div className="place-image-wrap"><img src={p.image} alt={p.name}/><button className={favorites.includes(p.id) ? 'favorite saved' : 'favorite'} onClick={() => toggleFavorite(p.id)} aria-label="Save place"><Heart size={18} fill={favorites.includes(p.id) ? 'currentColor' : 'none'}/></button><span className="place-category">{p.category}</span></div><div className="place-info"><div className="place-title-row"><h3>{p.name}</h3><span className="rating"><Star size={14} fill="currentColor"/>{p.rating}</span></div><p>{p.description}</p><div className="place-meta"><span><MapPin size={14}/>{p.city}</span><span><Clock3 size={14}/>{p.distance}</span></div><div className="tag-row">{p.halal && <span><Utensils size={12}/>{t.halal}</span>}{p.family && <span><Baby size={12}/>{t.family}</span>}{p.accessible && <span><Accessibility size={12}/>{t.accessible}</span>}</div><button className="place-details" onClick={() => onSelect(p)}>{t.details}<ChevronLeft size={16}/></button></div></article>)}</div>;
+  return <div className="place-grid">{items.map(p => <article className="place-card" key={p.id}><div className="place-image-wrap"><img src={p.image} alt={p.name}/><button className={favorites.includes(p.id) ? 'favorite saved' : 'favorite'} onClick={() => toggleFavorite(p.id)} aria-label="Save place"><Heart size={18} fill={favorites.includes(p.id) ? 'currentColor' : 'none'}/></button><span className="place-category">{p.category}</span></div><div className="place-info"><div className="place-title-row"><h3>{p.name}</h3><span className="rating"><Star size={14} fill="currentColor"/>{p.rating}</span></div><p>{p.description}</p><div className="place-meta"><span><MapPin size={14}/>{p.city}</span><span><Clock3 size={14}/>{p.distance}</span></div><div className="tag-row">{p.nature && <span><Map size={12}/>{t.nature}</span>}{p.family && <span><Baby size={12}/>{t.family}</span>}{p.accessible && <span><Accessibility size={12}/>{t.accessible}</span>}</div><button className="place-details" onClick={() => onSelect(p)}>{t.details}<ChevronLeft size={16}/></button></div></article>)}</div>;
 }
 
 export default App;
