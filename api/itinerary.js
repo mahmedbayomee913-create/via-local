@@ -9,6 +9,8 @@ export default async function handler(req, res) {
     const country = clean(body.country, 100);
     const days = Math.max(1, Math.min(30, Number(body.days) || 1));
     const currency = clean(body.currency, 8) || 'USD';
+    const budget = body.budget === '' || body.budget === null || body.budget === undefined ? null : Number(body.budget);
+    if (budget !== null && (!Number.isFinite(budget) || budget < 0)) return res.status(400).json({ error: 'Enter a valid trip budget.' });
     const interests = Array.isArray(body.interests) ? body.interests.slice(0, 12).map(v => clean(v, 40)).filter(Boolean) : [];
     if (!city) return res.status(400).json({ error: 'Enter a city to plan your trip.' });
     const [destinations, experiences] = await Promise.all([
@@ -39,7 +41,7 @@ export default async function handler(req, res) {
     });
     const user = await getCustomer(req, res);
     const record = await db('itineraries', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
-      user_id: user?.id || null, title: `${city} trip plan`, city, country: country || null, days, currency, interests, plan
+      user_id: user?.id || null, title: `${city} trip plan`, city, country: country || null, days, budget, currency, interests, plan
     }) });
     return res.status(201).json({ ok: true, itinerary: record?.[0] || null, plan });
   } catch (e) {
