@@ -1,7 +1,7 @@
 import { db } from '../_lib/db.js';
 import { getCustomer } from '../_lib/customer.js';
 export default async function handler(req, res) {
-  const user = await getCustomer(req);
+  const user = await getCustomer(req, res);
   if (!user) return res.status(401).json({ error: 'Please sign in first.' });
   try {
     if (req.method === 'GET') {
