@@ -33,47 +33,29 @@ const guides = [
 ];
 
 const copy = {
-  ar: {
-    explore: 'لا تزُر المكان... انتمِ إليه', guides: 'عِش عُمان بعيون أهلها', access: 'السفر للجميع... بلا حواجز',
-    home: 'الرئيسية', discover: 'اكتشف العالم', localGuides: 'المرشدون المحليون', inclusive: 'الوصول الشامل',
-    tagline: 'العالم أقرب مما تتخيّل', sub: 'اكتشف وجهات استثنائية حول العالم؛ من المدن القديمة والمواقع الأثرية إلى الطبيعة والثقافات المختلفة، في تجربة سفر واحدة.',
-    search: 'ابحث عن دولة أو مدينة أو وجهة...', start: 'ابدأ الاستكشاف', exploreTitle: 'وجهات حول العالم تستحق التجربة',
-    exploreSub: 'اختار وجهتك واكتشف حكايات المواقع التاريخية والثقافات والطبيعة.', all: 'كل الوجهات', family: 'مناسب للعائلات',
-    halal: 'خيارات الطعام الحلال', nature: 'طبيعة ومغامرات', accessible: 'معلومات الوصول', guidesTitle: 'اكتشف عُمان مع أهلها',
-    guidesSub: 'تعرّف على نماذج تجريبية لخدمات الإرشاد المحلي. لا تمثل هذه الملفات أشخاصًا حقيقيين أو حجوزات متاحة.',
-    viewProfile: 'عرض الملف', book: 'طلب تواصل تجريبي', accessTitle: 'تجربة سفر أكثر شمولًا',
-    accessSub: 'نعمل على توضيح معلومات الوصول واحتياجات الزوار، مع أدوات تواصل أولية.',
-    mapTitle: 'خريطة الوصول — نموذج توضيحي', mapSub: 'الخريطة الحالية رسم تجريبي وليست بيانات جغرافية مباشرة.',
-    communication: 'مساعد تحويل النص إلى صوت', communicationSub: 'اكتب العبارة وسيحاول المتصفح قراءتها بصوت مسموع.',
-    typeHere: 'اكتب ما تريد قوله...', speak: 'استمع إلى العبارة', stop: 'إيقاف الصوت',
-    location: 'استخدم موقعي', locationHelp: 'يمكنك السماح بالموقع من جهازك؛ لا نستخدمه حاليًا لجلب أماكن حقيقية.',
-    featured: 'ابدأ من هنا', categories: 'تجارب حول العالم', history: 'تاريخ وثقافة', familyCat: 'عائلات وأطفال',
-    food: 'مطاعم ومقاهٍ', accessibleCat: 'وصول ميسّر', rating: 'التقييم', distance: 'المنطقة',
-    details: 'التفاصيل', demo: 'نسخة تجريبية', footer: 'رحلتك تبدأ بفهم المكان.', requestSent: 'تم تسجيل طلبك التجريبي فقط — لا يوجد حجز فعلي.',
-    close: 'إغلاق', searchResults: 'نتائج الاستكشاف', noResults: 'لا توجد نتائج مطابقة. جرّب تغيير البحث أو الفلاتر.',
-    filter: 'تصفية', language: 'English', verifiedNote: 'المعلومات تعريفية أولية؛ تحقق من تفاصيل الزيارة والحجز من الجهات الرسمية. الصور قد تكون توضيحية، والتقييمات والتوافر غير متصلين.'
-  },
-  en: {
-    explore: 'Don’t just visit. Belong.', guides: 'See Oman through local eyes', access: 'Travel without barriers',
-    home: 'Home', discover: 'Explore the world', localGuides: 'Local guides', inclusive: 'Accessibility',
-    tagline: 'The world is closer than you imagine', sub: 'Discover extraordinary destinations—from ancient cities and archaeological sites to landscapes and cultures—in one travel experience.',
-    search: 'Search a country, city, or destination...', start: 'Start exploring', exploreTitle: 'Destinations around the world worth experiencing',
-    exploreSub: 'Explore historic places, cultures, landscapes, and remarkable destinations.', all: 'All destinations', family: 'Family-friendly',
-    halal: 'Halal food options', nature: 'Nature & outdoors', accessible: 'Accessibility info', guidesTitle: 'Discover Oman with locals',
-    guidesSub: 'These are sample guide profiles for demonstration only, not real people or available bookings.',
-    viewProfile: 'View profile', book: 'Send demo request', accessTitle: 'A more inclusive travel experience',
-    accessSub: 'We aim to make accessibility information clearer and provide simple communication tools.',
-    mapTitle: 'Accessibility map — demo', mapSub: 'This illustration is not live geographic data.',
-    communication: 'Text-to-speech assistant', communicationSub: 'Type a phrase and your browser will try to read it aloud.',
-    typeHere: 'Type what you want to say...', speak: 'Speak phrase', stop: 'Stop',
-    location: 'Use my location', locationHelp: 'You can grant location permission; it is not yet used to fetch real places.',
-    featured: 'Start here', categories: 'Experiences around the world', history: 'History & culture', familyCat: 'Families & kids',
-    food: 'Restaurants & cafes', accessibleCat: 'Accessible travel', rating: 'Rating', distance: 'Region',
-    details: 'Details', demo: 'Prototype', footer: 'Your journey starts with understanding the place.', requestSent: 'Demo request noted only — no real booking was made.',
-    close: 'Close', searchResults: 'Discovery results', noResults: 'No matching destinations. Try changing your search or filters.',
-    filter: 'Filters', language: 'العربية', verifiedNote: 'Introductory information; verify visitor details with official sources. Images may be illustrative; ratings and availability are not live.'
-  }
+ar:{explore:'لا تزُر المكان... انتمِ إليه',guides:'عِش المكان بعيون أهله',access:'السفر للجميع... بلا حواجز',home:'الرئيسية',discover:'اكتشف العالم',localGuides:'المرشدون المحليون',inclusive:'الوصول الشامل',tagline:'العالم أقرب مما تتخيّل',heroLine1:'سفر آمن وشامل...',heroLine2:'انتمِ إلى المكان',sub:'فيا لوكال يجمع استكشاف الوجهات، والتعرّف على المرشدين المحليين، ومعلومات الوصول الشامل — في تجربة واحدة.',heroLabel:'منصة سياحية ذكية · تجربة سفر للجميع',announcement:'منصة فيا لوكال — استكشف العالم بأمان، واكتشف المكان مع أهله',search:'ابحث عن دولة أو مدينة أو وجهة...',start:'ابدأ الاستكشاف',exploreTitle:'وجهات حول العالم تستحق التجربة',exploreSub:'اكتشف حكايات المواقع التاريخية والثقافات والطبيعة.',all:'كل الوجهات',family:'مناسب للعائلات',halal:'خيارات الطعام الحلال',nature:'طبيعة ومغامرات',accessible:'إمكانية الوصول',guidesTitle:'تعرّف على المرشدين المحليين',guidesSub:'ملفات مرشدين افتراضية للعرض فقط؛ ليست أشخاصًا حقيقيين ولا حجوزات متاحة.',guidesFeatureSub:'تعرّف على نماذج توضيحية لخدمة الإرشاد المحلي.',accessSub:'معلومات وصول توضيحية وأدوات تواصل أولية.',viewProfile:'عرض الملف',book:'طلب تجريبي',accessTitle:'تجربة سفر أكثر شمولًا',mapTitle:'خريطة الوصول — نموذج توضيحي',mapSub:'الرسم الحالي ليس خريطة فعلية ولا يعرض بيانات أماكن مباشرة.',communication:'تحويل النص إلى صوت',communicationSub:'اكتب عبارة وسيحاول المتصفح قراءتها بصوت مسموع.',typeHere:'اكتب ما تريد قوله...',speak:'استمع إلى العبارة',stop:'إيقاف الصوت',location:'استخدم موقعي',locationHelp:'الموقع اختياري ولا يُستخدم حاليًا لجلب أماكن حقيقية.',featured:'وجهات مختارة',categories:'اكتشف تجارب جديدة',history:'تاريخ وثقافة',familyCat:'عائلات وأطفال',food:'مطاعم ومقاهٍ',accessibleCat:'وصول ميسّر',rating:'التقييم',distance:'المنطقة',details:'التفاصيل',demo:'نسخة تجريبية',footer:'رحلتك تبدأ بفهم المكان.',requestSent:'هذا إجراء تجريبي فقط — لم يتم إنشاء حجز أو طلب حقيقي.',close:'إغلاق',searchResults:'نتائج الاستكشاف',noResults:'لا توجد نتائج مطابقة. جرّب تغيير البحث أو الفلاتر.',filter:'تصفية',language:'English',verifiedNote:'معلومات تعريفية أولية. تحقق من تفاصيل الزيارة من المصادر الرسمية. الصور قد تكون توضيحية، ولا توجد تقييمات أو توافر مباشر.',saved:'تمت إضافة المكان إلى المفضلة.',unsaved:'تمت إزالة المكان من المفضلة.',save:'أضف للمفضلة',savedLabel:'في المفضلة',homeAria:'العودة للرئيسية',menuAria:'فتح القائمة',saveAria:'حفظ المكان في المفضلة'},
+en:{explore:'Don’t just visit. Belong.',guides:'Experience places through local eyes',access:'Travel without barriers',home:'Home',discover:'Explore the world',localGuides:'Local guides',inclusive:'Accessibility',tagline:'The world is closer than you imagine',heroLine1:'Travel safely and inclusively...',heroLine2:'Belong to the place',sub:'VIA LOCAL brings destination discovery, local guide introductions, and accessibility information together in one experience.',heroLabel:'Smart travel platform · Travel for everyone',announcement:'VIA LOCAL — Explore the world safely and discover places with local people',search:'Search a country, city, or destination...',start:'Start exploring',exploreTitle:'Destinations around the world worth experiencing',exploreSub:'Discover stories, historic sites, cultures, and nature.',all:'All destinations',family:'Family-friendly',halal:'Halal food options',nature:'Nature & outdoors',accessible:'Accessibility',guidesTitle:'Meet local guides',guidesSub:'Sample profiles for demonstration only; these are not real people or available bookings.',guidesFeatureSub:'Preview an illustrative local-guide service.',accessSub:'Illustrative accessibility information and basic communication tools.',viewProfile:'View profile',book:'Demo request',accessTitle:'A more inclusive travel experience',mapTitle:'Accessibility map — demo',mapSub:'This illustration is not a real map and does not show live place data.',communication:'Text-to-speech',communicationSub:'Type a phrase and your browser may read it aloud.',typeHere:'Type what you want to say...',speak:'Speak phrase',stop:'Stop speech',location:'Use my location',locationHelp:'Location is optional and is not used to fetch real places yet.',featured:'Featured destinations',categories:'Discover new experiences',history:'History & culture',familyCat:'Families & kids',food:'Restaurants & cafes',accessibleCat:'Accessible travel',rating:'Rating',distance:'Area',details:'Details',demo:'Prototype',footer:'Your journey starts with understanding the place.',requestSent:'Demo only — no real booking or request was created.',close:'Close',searchResults:'Discovery results',noResults:'No matches. Try changing your search or filters.',filter:'Filters',language:'العربية',verifiedNote:'Introductory information. Verify visitor details with official sources. Images may be illustrative; ratings and availability are not live.',saved:'Added to favorites.',unsaved:'Removed from favorites.',save:'Save to favorites',savedLabel:'Saved',homeAria:'Go to home',menuAria:'Open menu',saveAria:'Save place to favorites'}
 };
+
+const placeEN = {
+1:{name:'Sultan Qaboos Grand Mosque',city:'Muscat',category:'Cultural',distance:'Muscat',tags:['Architecture','Culture'],description:'A prominent architectural landmark in Muscat. Check visitor hours and entry guidance before your visit.'},
+2:{name:'Mutrah Souq',city:'Muscat',category:'Heritage',distance:'Mutrah',tags:['Shopping','Heritage'],description:'A traditional market reflecting Muscat’s historic maritime character.'},
+3:{name:'Nizwa Fort',city:'Nizwa',category:'Historic',distance:'Al Dakhiliyah',tags:['History','Architecture'],description:'A historic fort showcasing Omani defensive architecture and heritage.'},
+4:{name:'Wadi Shab',city:'Sur area',category:'Nature',distance:'South Al Sharqiyah',tags:['Water','Outdoor'],description:'A natural valley known for water and mountain scenery. Access involves walking; check weather and local safety guidance.'},
+5:{name:'Wadi Darbat',city:'Salalah',category:'Nature',distance:'Dhofar',tags:['Nature','Family'],description:'A scenic area with seasonal greenery and waterfalls; conditions vary by season.'},
+6:{name:'Khasab Fort',city:'Khasab',category:'Heritage',distance:'Musandam',tags:['History','Culture'],description:'A historic Omani fort in Musandam, offering a glimpse into the region’s heritage.'},
+7:{name:'Sharqiyah Sands',city:'Bidiyah',category:'Nature',distance:'North Al Sharqiyah',tags:['Desert','Local experiences'],description:'A broad desert landscape. Use licensed providers and follow local safety advice.'},
+8:{name:'Al Mughsail Beach',city:'Salalah',category:'Nature',distance:'Dhofar',tags:['Beach','Nature'],description:'A coastal area west of Salalah known for scenery and blowholes in suitable sea conditions.'},
+9:{name:'Göbekli Tepe',city:'Türkiye',category:'Archaeological',distance:'Şanlıurfa',tags:['Archaeology','Prehistory'],description:'A Neolithic site with monumental T-shaped stone pillars and carved animal imagery, dating to roughly 11,500 years ago.'},
+10:{name:'Derinkuyu Underground City',city:'Türkiye',category:'Archaeological',distance:'Cappadocia',tags:['Underground city','History'],description:'A multi-level underground settlement with rooms and passages. Check visitor access and restrictions before travel.'},
+11:{name:'Ħal Saflieni Hypogeum',city:'Malta',category:'Archaeological',distance:'Paola',tags:['Prehistoric','Underground'],description:'A prehistoric underground complex used as a burial site, with chambers cut into limestone. Visits are limited and advance booking is required.'},
+12:{name:'Skara Brae',city:'Scotland',category:'Archaeological',distance:'Orkney',tags:['Neolithic','Ancient village'],description:'A remarkably preserved Neolithic settlement with stone-built homes and furnishings.'},
+13:{name:'Djémila',city:'Algeria',category:'Archaeological',distance:'Sétif',tags:['Roman','Ancient city'],description:'A Roman town in a mountain setting, with a forum, temples, basilicas, arches, and houses.'},
+14:{name:'Great Zimbabwe',city:'Zimbabwe',category:'Archaeological',distance:'Masvingo',tags:['African heritage','Stone ruins'],description:'Ruins of a major Shona city and trading centre, built with dry-stone masonry between the 11th and 15th centuries.'},
+15:{name:'Tiwanaku',city:'Bolivia',category:'Archaeological',distance:'La Paz region',tags:['Pre-Inca','Monuments'],description:'A major pre-Hispanic ceremonial and political centre on the Andean Altiplano, known for monumental stone architecture.'},
+16:{name:'Sukhothai Historical Park',city:'Thailand',category:'Archaeological',distance:'Sukhothai',tags:['History','Buddhist monuments'],description:'A historic park preserving temples, Buddhist images, and remains of the Sukhothai kingdom.'}
+};
+function localizedPlace(p,lang){return lang==='en'?{...p,...(placeEN[p.id]||{})}:p;}
 
 function App() {
   const [lang, setLang] = useState('ar');
