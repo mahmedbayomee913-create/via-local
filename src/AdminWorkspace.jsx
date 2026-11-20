@@ -20,7 +20,7 @@ const contentTypes = {
     fields: [
       ['name_ar','الاسم بالعربية','Arabic name','text',true],['name_en','الاسم بالإنجليزية','English name','text',true],['bio_ar','نبذة بالعربية','Arabic bio','textarea'],['bio_en','نبذة بالإنجليزية','English bio','textarea'],
       ['city_ar','المدينة بالعربية','Arabic city','text'],['city_en','المدينة بالإنجليزية','English city','text'],['country_ar','الدولة بالعربية','Arabic country','text'],['country_en','الدولة بالإنجليزية','English country','text'],
-      ['languages','اللغات (بفواصل)','Languages (comma separated)','array'],['specialties','التخصصات (بفواصل)','Specialties (comma separated)','array'],['price','السعر','Price','number'],['currency','العملة','Currency','text'],['avatar_url','رابط الصورة الشخصية','Avatar URL','text'],['verified','مرشد موثّق','Verified','boolean'],['published','منشور على الموقع','Published on site','boolean']
+      ['languages','اللغات (بفواصل)','Languages (comma separated)','array'],['specialties','التخصصات (بفواصل)','Specialties (comma separated)','array'],['price','السعر','Price','number'],['currency','العملة','Currency','text'],['avatar_url','رابط الصورة الشخصية','Avatar URL','text'],['is_demo','ملف تجريبي (بيانات افتراضية)','Demo profile (fictional data)','boolean'],['verified','مرشد موثّق','Verified','boolean'],['published','منشور على الموقع','Published on site','boolean']
     ]
   },
   experiences: {
@@ -43,7 +43,7 @@ const applicationStatuses = ['pending','reviewing','approved','rejected'];
 const statusAr = {pending:'قيد الانتظار',accepted:'مقبول',confirmed:'مؤكد',cancelled:'ملغي',completed:'مكتمل',rejected:'مرفوض',reviewing:'قيد المراجعة',approved:'تمت الموافقة'};
 const statusEn = {pending:'Pending',accepted:'Accepted',confirmed:'Confirmed',cancelled:'Cancelled',completed:'Completed',rejected:'Rejected',reviewing:'Reviewing',approved:'Approved'};
 const money = (v,c='USD') => new Intl.NumberFormat('en',{style:'currency',currency:c,maximumFractionDigits:2}).format(Number(v||0));
-const blankFor = fields => Object.fromEntries(fields.map(([key,,,,required]) => [key, key==='published'||key==='verified'||key==='featured'||key==='family_friendly'||key==='nature'||key==='halal_options'||key==='accessible' ? false : key==='price'?0:key==='capacity'?10:key==='duration_minutes'?120:key==='currency'?'USD':'']));
+const blankFor = fields => Object.fromEntries(fields.map(([key,,,,required]) => [key, key==='published'||key==='verified'||key==='is_demo'||key==='featured'||key==='family_friendly'||key==='nature'||key==='halal_options'||key==='accessible' ? false : key==='price'?0:key==='capacity'?10:key==='duration_minutes'?120:key==='currency'?'USD':'']));
 
 export default function AdminWorkspace({ section, lang='ar' }) {
   const rtl = lang === 'ar';
@@ -130,7 +130,7 @@ export default function AdminWorkspace({ section, lang='ar' }) {
   };
 
   async function deleteContent(id) {
-    if (!window.confirm(t('متأكد من حذف العنصر؟','Delete this item?'))) return;
+    if (!window.confirm(type==='guides' ? t('متأكد من حذف ملف المرشد؟ سيتم حذفه من الموقع وقاعدة البيانات.','Delete this guide profile from the site and database?') : t('متأكد من حذف العنصر؟','Delete this item?'))) return;
     try {
       const r = await fetch(`/api/admin/content/${id}?type=${type}`,{method:'DELETE'});
       const d = await r.json(); if(!r.ok) throw new Error(d.error || 'Delete failed.');
@@ -156,6 +156,7 @@ export default function AdminWorkspace({ section, lang='ar' }) {
     return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
       <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL CMS</span><h2>{title}</h2><p>{t('أضف الوجهات والمرشدين والتجارب والمحتوى، ثم انشرها للموقع.','Create destinations, guides, experiences and pages, then publish them.')}</p></div><button className="workspace-primary" onClick={beginNew}><Plus size={16}/>{t('إضافة جديد','Add new')}</button></div>
       <div className="workspace-toolbar"><select value={type} onChange={e=>setType(e.target.value)}>{Object.entries(contentTypes).map(([key,v])=><option key={key} value={key}>{rtl?v.ar:v.en}</option>)}</select><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={t('ابحث في المحتوى...','Search content...')}/><button onClick={load} disabled={loading}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div>
+      {type==='guides'&&<div className="workspace-demo-note">{t('الملفات التجريبية مميزة بعلامة «ملف تجريبي». يمكنك تعديلها أو حذفها من هنا. أي ملف جديد لمرشد حقيقي اترك خيار «ملف تجريبي» مغلقًا ولا تمنحه توثيقًا قبل مراجعة بياناته.','Demo profiles are marked with a Demo badge. You can edit or delete them here. For a real guide, leave Demo profile off and do not verify the profile before checking its details.')}</div>}
       {error&&<div className="workspace-error">{error}</div>}
       {editing!==null && <form className="workspace-form" onSubmit={saveContent}>
         <div className="workspace-form-head"><strong>{editing==='new'?t('إضافة عنصر جديد','Create item'):t('تعديل العنصر','Edit item')}</strong><button type="button" onClick={()=>setEditing(null)}><X size={17}/></button></div>
@@ -168,6 +169,7 @@ export default function AdminWorkspace({ section, lang='ar' }) {
         {loading?<div className="workspace-empty"><RefreshCw className="spin"/> {t('جارٍ تحميل المحتوى...','Loading content...')}</div>:filtered.map(row=><article className="workspace-item" key={row.id}>
           <div className="workspace-item-main"><strong>{row.name_ar||row.title_ar||row.title_en||row.name_en||row.slug||row.id}</strong><small>{row.city_ar||row.city_en||row.category||row.specialties?.join(' · ')||row.slug||row.id}</small></div>
           <span className={'workspace-badge '+(row.published?'published':'draft')}>{row.published?t('منشور','Published'):t('مسودة','Draft')}</span>
+          {type==='guides'&&row.is_demo&&<span className="workspace-badge demo">{t('ملف تجريبي','Demo profile')}</span>}
           <button className="workspace-icon-btn" onClick={()=>beginEdit(row)} title={t('تعديل','Edit')}><Pencil size={16}/></button>
           <button className="workspace-icon-btn danger" onClick={()=>deleteContent(row.id)} title={t('حذف','Delete')}><Trash2 size={16}/></button>
         </article>)}
