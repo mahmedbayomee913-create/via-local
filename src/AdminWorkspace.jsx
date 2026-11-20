@@ -56,6 +56,10 @@ export default function AdminWorkspace({ section, lang='ar' }) {
   const [form,setForm] = useState({});
   const [saving,setSaving] = useState(false);
   const [search,setSearch] = useState('');
+  const [experienceOptions,setExperienceOptions] = useState([]);
+  const [manualBooking,setManualBooking] = useState({experience_id:'',customer_name:'',customer_phone:'',customer_email:'',booking_date:'',guests:1,notes:'',status:'pending'});
+  const [showManualBooking,setShowManualBooking] = useState(false);
+  const [savingBooking,setSavingBooking] = useState(false);
   const t = (ar,en) => rtl ? ar : en;
 
   async function load() {
@@ -70,6 +74,12 @@ export default function AdminWorkspace({ section, lang='ar' }) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not load data.');
       setItems(data.items || data.bookings || data.reviews || data.applications || []);
+      if (section === 'bookings') {
+        const experienceResponse = await fetch('/api/admin/content?type=experiences');
+        const experienceData = await experienceResponse.json();
+        if (!experienceResponse.ok) throw new Error(experienceData.error || 'Could not load experiences.');
+        setExperienceOptions((experienceData.items || []).filter(x => x.published));
+      }
     } catch (e) { setError(e.message || 'Could not load data.'); }
     finally { setLoading(false); }
   }
@@ -155,10 +165,25 @@ export default function AdminWorkspace({ section, lang='ar' }) {
   }
 
   if (section === 'bookings') return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
-    <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL OPERATIONS</span><h2>{title}</h2><p>{t('راجع طلبات الحجز وغيّر حالتها من مكان واحد.','Review booking requests and update their status.')}</p></div><button className="workspace-quiet" onClick={load}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div>
+    <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL OPERATIONS</span><h2>{title}</h2><p>{t('راجع طلبات الحجز وأضف حجزًا يدويًا للعميل وغيّر حالته.','Review requests, create a booking manually, and update its status.')}</p></div><div className="workspace-heading-actions"><button className="workspace-primary" onClick={startManualBooking}><Plus size={16}/>{t('إضافة حجز','Add booking')}</button><button className="workspace-quiet" onClick={load}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div></div>
     {error&&<div className="workspace-error">{error}</div>}
-    <div className="workspace-list">{loading?<div className="workspace-empty">{t('جارٍ التحميل...','Loading...')}</div>:filtered.map(b=><article className="workspace-row" key={b.id}><div className="workspace-item-main"><strong>{b.customer_name} · {b.booking_code}</strong><small>{b.customer_phone} · {b.booking_date} · {b.guests} {t('أفراد','guests')}</small><small>{b.customer_email||'—'} · {money(b.total_amount,b.currency)}</small></div><select value={b.status} onChange={e=>patchStatus('bookings',b,e.target.value)}>{bookingStatuses.map(s=><option key={s} value={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select></article>)}
-    {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد حجوزات حتى الآن.','No bookings yet.')}</div>}</div>
+    {showManualBooking&&<form className="workspace-form" onSubmit={submitManualBooking}>
+      <div className="workspace-form-head"><strong>{t('إضافة حجز يدوي','Create manual booking')}</strong><button type="button" onClick={()=>setShowManualBooking(false)}><X size={17}/></button></div>
+      <div className="workspace-fields">
+        <label>{t('التجربة *','Experience *')}<select required value={manualBooking.experience_id} onChange={e=>setManualBooking({...manualBooking,experience_id:e.target.value})}><option value="">{t('اختر تجربة منشورة','Choose published experience')}</option>{experienceOptions.map(x=><option key={x.id} value={x.id}>{x.title_ar||x.title_en} · {money(x.price,x.currency)}</option>}</select></label>
+        <label>{t('اسم العميل *','Customer name *')}<input required maxLength="100" value={manualBooking.customer_name} onChange={e=>setManualBooking({...manualBooking,customer_name:e.target.value})}/></label>
+        <label>{t('رقم الهاتف *','Phone *')}<input required maxLength="40" type="tel" value={manualBooking.customer_phone} onChange={e=>setManualBooking({...manualBooking,customer_phone:e.target.value})}/></label>
+        <label>{t('البريد الإلكتروني','Email')}<input type="email" maxLength="160" value={manualBooking.customer_email} onChange={e=>setManualBooking({...manualBooking,customer_email:e.target.value})}/></label>
+        <label>{t('تاريخ التجربة *','Booking date *')}<input required type="date" min={new Date().toISOString().slice(0,10)} value={manualBooking.booking_date} onChange={e=>setManualBooking({...manualBooking,booking_date:e.target.value})}/></label>
+        <label>{t('عدد الأشخاص','Guests')}<input type="number" min="1" max="30" value={manualBooking.guests} onChange={e=>setManualBooking({...manualBooking,guests:e.target.value})}/></label>
+        <label>{t('الحالة','Status')}<select value={manualBooking.status} onChange={e=>setManualBooking({...manualBooking,status:e.target.value})}>{bookingStatuses.map(s=><option key={s} value={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select></label>
+        <label className="wide">{t('ملاحظات','Notes')}<textarea rows="2" maxLength="1000" value={manualBooking.notes} onChange={e=>setManualBooking({...manualBooking,notes:e.target.value})}/></label>
+      </div>
+      {!experienceOptions.length&&<div className="workspace-error">{t('لا توجد تجارب منشورة. أضف تجربة من إدارة المحتوى ثم انشرها أولًا.','No published experiences. Add an experience under Content and publish it first.')}</div>}
+      <div className="workspace-form-actions"><button type="button" className="workspace-quiet" onClick={()=>setShowManualBooking(false)}>{t('إلغاء','Cancel')}</button><button className="workspace-primary" disabled={savingBooking||!experienceOptions.length}>{savingBooking?t('جارٍ الحفظ...','Saving...'):t('حفظ الحجز','Save booking')}</button></div>
+    </form>}
+    <div className="workspace-list">{loading?<div className="workspace-empty">{t('جارٍ التحميل...','Loading...')}</div>:filtered.map(b=><article className="workspace-row" key={b.id}><div className="workspace-item-main"><strong>{b.customer_name} · {b.booking_code||b.id?.slice(0,8)}</strong><small>{b.customer_phone} · {b.booking_date} · {b.guests} {t('أفراد','guests')}</small><small>{b.customer_email||'—'} · {money(b.total_amount,b.currency)}</small></div><select value={b.status} onChange={e=>patchStatus('bookings',b,e.target.value)}>{bookingStatuses.map(s=><option key={s} value={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select></article>)}
+    {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد حجوزات حتى الآن. يمكنك إضافة حجز يدوي من الزر أعلى الصفحة.','No bookings yet. Create a manual booking from the button above.')}</div>}</div>
   </section>;
 
   if (section === 'reviews') return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
