@@ -32,3 +32,5 @@
 
 .access-map-live{display:flex;flex-direction:column;gap:9px}.access-map-live select{width:100%;border:1px solid #e0d8cc;border-radius:10px;padding:10px 12px;background:#fff;color:#45373e;font:inherit;font-size:11px}.access-map-live iframe{width:100%;height:260px;border:1px solid #e7ded3;border-radius:14px;display:block}.access-data-list{display:flex;flex-direction:column;gap:7px;background:#faf7f1;border:1px solid #eee4d5;border-radius:12px;padding:13px;margin:12px 0}.access-data-list strong{font-size:11px;color:#4a2436}.access-data-list span,.access-data-list small{font-size:10px;color:#7a6f6c;line-height:1.8}.access-data-list span{border-top:1px solid #eee7dd;padding-top:6px}
 @media(max-width:680px){.access-map-live iframe{height:220px}}
+
+.destination-review{display:grid;grid-template-columns:1fr auto;gap:5px 10px;padding:10px 12px;margin:8px 0;border:1px solid #eee6de;border-radius:11px;background:#fffaf5}.destination-review strong{font-size:11px;color:#44263a}.destination-review span{display:flex;align-items:center;gap:4px;font-size:10px;color:#a47c36}.destination-review p{grid-column:1/-1;margin:0;font-size:11px;line-height:1.7;color:#756a6e}
