@@ -25,9 +25,10 @@ create index if not exists guide_requests_status_idx
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
+set search_path = pg_catalog
 as $$
 begin
-  new.updated_at = now();
+  new.updated_at = pg_catalog.now();
   return new;
 end;
 $$;
@@ -37,9 +38,9 @@ create trigger guide_requests_set_updated_at
 before update on public.guide_requests
 for each row execute function public.set_updated_at();
 
--- The API uses the public anon key, but table access is restricted by
--- a private server-only header checked by RLS. Never expose the matching
--- VIA_LOCAL_DB_SECRET to browser/client code.
+-- The API uses the public anon key, but RLS accepts requests only when
+-- the server-only X-Via-Local-DB-Secret header matches this stored hash.
+-- Never put VIA_LOCAL_DB_SECRET in browser/client code.
 create schema if not exists private;
 revoke all on schema private from public, anon, authenticated;
 
@@ -56,7 +57,13 @@ values (true, '2db2064fd8215bedb17e9bc80c6301316d24750eef24abab7f97a5c12cf29b80'
 on conflict (singleton) do update
 set secret_hash = excluded.secret_hash;
 
-create or replace function public.via_local_backend_authorized()
+drop policy if exists "VIA LOCAL backend select" on public.guide_requests;
+drop policy if exists "VIA LOCAL backend insert" on public.guide_requests;
+drop policy if exists "VIA LOCAL backend update" on public.guide_requests;
+drop policy if exists "VIA LOCAL backend delete" on public.guide_requests;
+drop function if exists public.via_local_backend_authorized();
+
+create or replace function private.via_local_backend_authorized()
 returns boolean
 language sql
 stable
@@ -82,29 +89,24 @@ as $function$
   );
 $function$;
 
-revoke all on function public.via_local_backend_authorized() from public;
-grant execute on function public.via_local_backend_authorized() to anon;
-
+revoke all on function private.via_local_backend_authorized() from public, authenticated;
+grant usage on schema private to anon;
+grant execute on function private.via_local_backend_authorized() to anon;
 grant select, insert, update, delete on table public.guide_requests to anon;
-
-drop policy if exists "VIA LOCAL backend select" on public.guide_requests;
-drop policy if exists "VIA LOCAL backend insert" on public.guide_requests;
-drop policy if exists "VIA LOCAL backend update" on public.guide_requests;
-drop policy if exists "VIA LOCAL backend delete" on public.guide_requests;
 
 create policy "VIA LOCAL backend select"
 on public.guide_requests for select to anon
-using ((select public.via_local_backend_authorized()));
+using ((select private.via_local_backend_authorized()));
 
 create policy "VIA LOCAL backend insert"
 on public.guide_requests for insert to anon
-with check ((select public.via_local_backend_authorized()));
+with check ((select private.via_local_backend_authorized()));
 
 create policy "VIA LOCAL backend update"
 on public.guide_requests for update to anon
-using ((select public.via_local_backend_authorized()))
-with check ((select public.via_local_backend_authorized()));
+using ((select private.via_local_backend_authorized()))
+with check ((select private.via_local_backend_authorized()));
 
 create policy "VIA LOCAL backend delete"
 on public.guide_requests for delete to anon
-using ((select public.via_local_backend_authorized()));
+using ((select private.via_local_backend_authorized()));
