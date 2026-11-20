@@ -29,7 +29,7 @@ const places = [
 const guides = [
   { id: 1, name: 'مرشد محلي تجريبي 01', specialty: 'جولات ثقافية في الوجهات', languages: 'العربية • الإنجليزية', rating: '—', price: 'ملف تجريبي · لا توجد خدمة فعلية', initials: 'عُ' },
   { id: 2, name: 'مرشد محلي تجريبي 02', specialty: 'جولات تراثية وتاريخية', languages: 'العربية • الإنجليزية', rating: '—', price: 'ملف تجريبي · لا توجد خدمة فعلية', initials: 'ن' },
-  { id: 3, name: 'مرشد محلي تجريبي 03', specialty: 'تجارب طبيعة ومناطق محلية', languages: 'العربية • الإنجليزية', rating: '—', price: 'السعر عند تأكيد مقدم الخدمة', initials: 'ظ' }
+  { id: 3, name: 'مرشد محلي تجريبي 03', specialty: 'تجارب طبيعة ومناطق محلية', languages: 'العربية • الإنجليزية', rating: '—', price: 'ملف تجريبي · لا توجد خدمة فعلية', initials: 'ظ' }
 ];
 
 const copy = {
