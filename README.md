@@ -22,7 +22,7 @@ The service-role key is not required. Database requests are made by server route
 ## Database setup
 Run `supabase/guide_requests.sql` in Supabase SQL Editor on a fresh project. It creates the guide inquiry table, destination catalog, guides, experiences, bookings, reviews, user profiles, itineraries, digital passport visits, guide applications, favorites and protected RLS policies.
 
-The deployed project currently has eight initial destination records in Oman. Guide, experience and booking records should be entered and reviewed by the site operator before being published.
+The production catalogue now contains 76 published tourist destinations across 30 countries, including 30 destinations in Egypt and the eight requested archaeological sites. Destination photos are served from Wikimedia Commons thumbnails, and all published destinations have coordinates. The optional browser-location control sorts discovery results from nearest to farthest; coordinates stay in the browser session and are not sent to or stored by the application. Guide and experience listings remain empty until real provider records are reviewed and published by the site operator.
 
 ## Included product features
 
