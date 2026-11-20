@@ -1,7 +1,10 @@
-import { createSession, cookie, clearCookie } from '../auth.js';
+import { createSession, cookie, clearCookie, isAdmin } from '../auth.js';
 const attempts = new Map();
 function clientKey(req){ return String(req.headers['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0].trim(); }
 export default function handler(req, res) {
+  if (req.method === 'GET') {
+    return isAdmin(req) ? res.status(200).json({ ok: true }) : res.status(401).json({ error: 'Unauthorized' });
+  }
   if (req.method === 'POST') {
     const key=clientKey(req), now=Date.now(), record=attempts.get(key);
     if(record?.blockedUntil>now){res.setHeader('Retry-After',String(Math.ceil((record.blockedUntil-now)/1000)));return res.status(429).json({error:'Too many attempts. Try again later.'});}
@@ -17,6 +20,6 @@ export default function handler(req, res) {
     res.setHeader('Set-Cookie', clearCookie());
     return res.status(200).json({ ok: true });
   }
-  res.setHeader('Allow', 'POST, DELETE');
+  res.setHeader('Allow', 'GET, POST, DELETE');
   return res.status(405).end();
 }
