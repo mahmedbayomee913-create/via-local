@@ -18,7 +18,14 @@ export default async function handler(req, res) {
       const body = req.body || {};
       const payload = Object.fromEntries(fields[type].filter(k => body[k] !== undefined).map(k => [k, body[k]]));
       if (!Object.keys(payload).length) return res.status(400).json({ error: 'No valid changes supplied.' });
-      if (type === 'guides' && payload.is_demo === true && payload.verified === true) return res.status(400).json({ error: 'Demo guide profiles cannot be verified.' });
+      if (type === 'guides' && payload.verified === true) {
+        let isDemo = payload.is_demo;
+        if (isDemo === undefined) {
+          const current = await db(`guides?id=eq.${id}&select=is_demo`);
+          isDemo = current?.[0]?.is_demo === true;
+        }
+        if (isDemo) return res.status(400).json({ error: 'Demo guide profiles cannot be verified.' });
+      }
       const updated = await db(`${type}?id=eq.${id}`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify(payload) });
       return res.status(200).json({ item: updated?.[0] || null });
     }
