@@ -152,7 +152,7 @@ function App() {
           </section>
           <section className="container section">
             <div className="section-heading"><div><span className="eyebrow gold-text">{t.featured}</span><h2>{t.exploreTitle}</h2></div><button className="text-link" onClick={() => setTab('explore')}>{t.details}<ChevronLeft size={17}/></button></div>
-            <PlaceGrid items={places.slice(0,3)} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} onSelect={setSelectedPlace}/>
+            <PlaceGrid items={places.slice(8,11)} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} onSelect={setSelectedPlace}/>
           </section>
         </>}
 
@@ -194,7 +194,7 @@ function App() {
 }
 
 function PlaceGrid({items, t, lang, favorites, toggleFavorite, onSelect}) {
-  return <div className="place-grid">{items.map(p => { const lp = localizedPlace(p, lang); return <article className="place-card" key={p.id}><div className="place-image-wrap"><img src={p.image} alt={lp.name}/><button className={favorites.includes(p.id) ? 'favorite saved' : 'favorite'} onClick={() => {const wasSaved=favorites.includes(p.id);toggleFavorite(p.id);}} aria-label={t.saveAria}><Heart size={18} fill={favorites.includes(p.id) ? 'currentColor' : 'none'}/></button><span className="place-category">{lp.category}</span></div><div className="place-info"><div className="place-title-row"><h3>{lp.name}</h3><span className="rating"><Star size={14} fill="currentColor"/>{p.rating}</span></div><p>{lp.description}</p><div className="place-meta"><span><MapPin size={14}/>{lp.city}</span><span><Clock3 size={14}/>{lp.distance}</span></div><div className="tag-row">{p.nature && <span><Map size={12}/>{t.nature}</span>}{p.family && <span><Baby size={12}/>{t.family}</span>}{p.accessible && <span><Accessibility size={12}/>{t.accessible}</span>}</div><button className="place-details" onClick={() => onSelect(p)}>{t.details}<ChevronLeft size={16}/></button></div></article>})}</div>;
+  return <div className="place-grid">{items.map(p => { const lp = localizedPlace(p, lang); return <article className="place-card" key={p.id}><div className="place-image-wrap"><img src={p.image} alt={lp.name}/><button className={favorites.includes(p.id) ? 'favorite saved' : 'favorite'} onClick={() => toggleFavorite(p.id)} aria-label={favorites.includes(p.id) ? t.savedLabel : t.saveAria}><Heart size={18} fill={favorites.includes(p.id) ? 'currentColor' : 'none'}/></button><span className="place-category">{lp.category}</span></div><div className="place-info"><div className="place-title-row"><h3>{lp.name}</h3><span className="rating"><Star size={14} fill="currentColor"/>{p.rating}</span></div><p>{lp.description}</p><div className="place-meta"><span><MapPin size={14}/>{lp.city}</span><span><Clock3 size={14}/>{lp.distance}</span></div><div className="tag-row">{p.nature && <span><Map size={12}/>{t.nature}</span>}{p.family && <span><Baby size={12}/>{t.family}</span>}{p.accessible && <span><Accessibility size={12}/>{t.accessible}</span>}</div><button className="place-details" onClick={() => onSelect(p)}>{t.details}<ChevronLeft size={16}/></button></div></article>})}</div>;
 }
 
 export default App;
