@@ -117,7 +117,7 @@ function App() {
         <div className="container header-inner">
           <button className="brand" onClick={() => navigate('home')} aria-label={t.homeAria}>
             <span className="brand-mark"><MapPin size={25} strokeWidth={2.5}/></span>
-            <span className="brand-name arabic-brand">فيا لوكال<small>VIA LOCAL</small></span>
+            <span className="brand-name">{rtl ? 'فيا لوكال' : 'VIA LOCAL'}<small>{rtl ? 'VIA LOCAL' : 'LOCAL EXPERIENCES'}</small></span>
           </button>
           <nav className="desktop-nav">
             {navItems.map(([id, label, Icon]) => <button key={id} className={tab === id ? 'nav-link active' : 'nav-link'} onClick={() => navigate(id)}><Icon size={17}/>{label}</button>)}
@@ -189,7 +189,7 @@ function App() {
         </section>}
       </main>
 
-      <footer className="footer"><div className="container footer-inner"><div className="footer-brand"><span className="brand-mark"><MapPin size={20}/></span><div><strong>VIA LOCAL</strong><small>{t.footer}</small></div></div><span className="footer-copy">© 2026 VIA LOCAL · {t.demo}</span></div></footer>
+      <footer className="footer"><div className="container footer-inner"><div className="footer-brand"><span className="brand-mark"><MapPin size={20}/></span><div><strong>{rtl ? 'فيا لوكال' : 'VIA LOCAL'}</strong><small>{t.footer}</small></div></div><span className="footer-copy">© 2026 VIA LOCAL · {t.demo}</span></div></footer>
 
       {notice && <div className="toast"><CheckCircle2 size={18}/>{notice}</div>}
       {selectedPlace && <div className="modal-backdrop" onClick={() => setSelectedPlace(null)}><div className="place-modal" onClick={e => e.stopPropagation()}><button className="modal-close" onClick={() => setSelectedPlace(null)} aria-label={t.close}><X/></button><img src={selectedPlace.image} alt={localizedPlace(selectedPlace,lang).name}/><div className="modal-body"><span className="eyebrow gold-text">{localizedPlace(selectedPlace,lang).city} · {localizedPlace(selectedPlace,lang).category}</span><h2>{localizedPlace(selectedPlace,lang).name}</h2><p>{localizedPlace(selectedPlace,lang).description}</p><div className="modal-facts"><span>{t.noRating}</span><span><MapPin size={16}/>{localizedPlace(selectedPlace,lang).distance}</span><span><Accessibility size={16}/>{selectedPlace.accessible ? t.accessible : (rtl ? 'لم يتم تأكيد التجهيزات' : 'Not verified')}</span></div><div className="modal-actions"><button className="btn-primary" onClick={() => {const placeId=selectedPlace.id;const wasSaved=favorites.includes(placeId);toggleFavorite(placeId);setSelectedPlace(null);notify(wasSaved?t.unsaved:t.saved)}}>{favorites.includes(selectedPlace.id) ? t.savedLabel : t.save}<Heart size={17}/></button><button className="btn-outline" onClick={() => sharePlace(selectedPlace)}>{rtl?'مشاركة':'Share'}<Globe2 size={17}/></button></div></div></div></div>}
