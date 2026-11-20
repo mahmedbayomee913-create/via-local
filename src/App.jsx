@@ -132,7 +132,7 @@ function Website() {
   const databasePlaces = liveCatalog.destinations.length ? liveCatalog.destinations.map(d => ({
     id:d.id, slug:d.slug, name_ar:d.name_ar, name_en:d.name_en, city_ar:d.city_ar, city_en:d.city_en,
     country_ar:d.country_ar, country_en:d.country_en, name:d.name_ar, city:d.city_ar||d.city_en,
-    category:d.category, category_ar:d.category_ar, category_en:d.category_en,
+    category:d.category, category_ar:d.category_ar||categoryLabels[d.category]?.ar, category_en:d.category_en||categoryLabels[d.category]?.en,
     distance:[d.city_ar||d.city_en,d.country_ar||d.country_en].filter(Boolean).join(' · '),
     description_ar:d.description_ar, description_en:d.description_en,
     image:d.image_url, tags:d.tags||[], family:d.family_friendly, nature:d.nature, accessible:d.accessible,
