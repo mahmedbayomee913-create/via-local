@@ -101,7 +101,7 @@ function Website() {
 
   const filteredPlaces = useMemo(() => placeList.filter(p => {
     const lp = localizedPlace(p, lang); const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')} ${lp.name} ${lp.city} ${lp.category} ${lp.tags.join(' ')}`.toLowerCase().includes(query.trim().toLowerCase());
-    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي','Archaeological','Historic','Heritage','Cultural'].includes(lp.category)) || (filter === 'accessible' && p.accessible) || (filter === 'favorites' && favorites.includes(p.id));
+    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي','Archaeological','Historic','Heritage','Cultural'].includes(lp.category)) || (filter === 'accessible' && p.accessible) || (filter === 'halal' && p.halal_options) || (filter === 'favorites' && favorites.includes(p.id));
     return matchesQuery && matchesFilter;
   }), [placeList, query, filter, lang, favorites]);
 
@@ -207,7 +207,7 @@ function Website() {
           <div className="filter-panel">
             <div className="search-field"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder={t.search}/></div>
             <div className="filter-chips">
-              {[['all',t.all],['family',t.family],['nature',t.nature],['history',t.history],['accessible',t.accessible],['favorites',t.favoritesFilter]].map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'chip selected' : 'chip'}>{label}</button>)}
+              {[['all',t.all],['family',t.family],['nature',t.nature],['history',t.history],['halal',t.halal],['accessible',t.accessible],['favorites',t.favoritesFilter]].map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'chip selected' : 'chip'}>{label}</button>)}
             </div>
           </div>
           <div className="results-caption"><span><SlidersHorizontal size={16}/>{t.searchResults}</span><small>{filteredPlaces.length} {rtl ? 'أماكن' : 'places'}</small></div>
