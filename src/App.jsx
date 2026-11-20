@@ -89,6 +89,7 @@ function Website() {
   const [mapPlaceId, setMapPlaceId] = useState('');
   const [userCoords, setUserCoords] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [catalogError, setCatalogError] = useState('');
   useEffect(() => {
     let active = true;
@@ -143,8 +144,9 @@ function Website() {
   const activeMapPlace = placeList.find(p=>p.id===mapPlaceId) || placeList[0];
   const guideList = liveCatalog.guides.map(g => ({
     id:g.id, name_ar:g.name_ar, name_en:g.name_en, name:g.name_ar, specialty:(g.specialties||[]).join(' · '),
-    languages:(g.languages||[]).join(' · '), price:g.price ? String(g.price)+' '+g.currency : (rtl?'تواصل لمعرفة السعر':'Contact for price'),
-    initials:(g.name_ar||'V').slice(0,2), isLive:true, verified:g.verified
+    languages:(g.languages||[]).join(' · '), location:[rtl?g.city_ar:g.city_en,rtl?g.country_ar:g.country_en].filter(Boolean).join(' · '),
+    price:g.price ? String(g.price)+' '+g.currency : (rtl?'تواصل لمعرفة السعر':'Contact for price'),
+    initials:(g.name_ar||'V').slice(0,2), isLive:true, isDemo:Boolean(g.is_demo), verified:g.verified
   }));
 
   const filteredPlaces = useMemo(() => {
@@ -165,20 +167,25 @@ function Website() {
     window.setTimeout(() => setNotice(''), 3200);
   };
 
-  const requestLocation = () => {
+  const requestLocation = () => setLocationDialogOpen(true);
+
+  const confirmLocation = () => {
+    setLocationDialogOpen(false);
     if (!navigator.geolocation) return notify(rtl?'المتصفح لا يدعم تحديد الموقع.':'Geolocation is not supported by this browser.');
     setLocationLoading(true);
     navigator.geolocation.getCurrentPosition(
       ({coords}) => {
         setUserCoords({latitude:coords.latitude,longitude:coords.longitude});
-        setLocationText(rtl?'تم ترتيب الوجهات من الأقرب إلى الأبعد. لا يتم حفظ إحداثياتك.':'Destinations are sorted nearest-first. Your coordinates are not stored.');
+        setLocationText(rtl?'تم ترتيب الوجهات من الأقرب إلى الأبعد. إحداثياتك لا تُحفظ ولا تُرسل إلى الخادم.':'Destinations are sorted nearest-first. Your coordinates are not stored or sent to the server.');
         setLocationLoading(false);
       },
       error => {
         setLocationLoading(false);
         notify(error?.code===1
-          ? (rtl?'إذن الموقع غير مفعّل. يمكنك الاستكشاف بدونه.':'Location permission was not granted. You can explore without it.')
-          : (rtl?'تعذر تحديد موقعك الآن؛ يمكنك الاستكشاف دون الموقع.':'Could not determine your location. You can continue without it.'));
+          ? (rtl?'لم تمنح إذن الموقع. يمكنك استخدام الموقع بدون تفعيله.':'Location permission was not granted. You can use the site without it.')
+          : error?.code===3
+            ? (rtl?'انتهت مهلة تحديد الموقع. حاول مرة أخرى أو تابع بدون الموقع.':'Location request timed out. Try again or continue without it.')
+            : (rtl?'تعذر تحديد موقعك الآن؛ يمكنك الاستكشاف دون الموقع.':'Could not determine your location. You can continue without it.'));
       },
       {enableHighAccuracy:false,timeout:12000,maximumAge:60000}
     );
@@ -203,7 +210,7 @@ function Website() {
     if (!requestForm.name.trim() || !requestForm.phone.trim() || !requestForm.destination.trim()) return;
     setRequestSending(true);
     try {
-      const response = await fetch('/api/guide-requests', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...requestForm,guide:requestGuide?.name || ''})});
+      const response = await fetch('/api/guide-requests', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...requestForm,guide:requestGuide?.name || '',notes:requestGuide?.isDemo ? `[DEMO GUIDE REQUEST] ${rtl?'طلب تجريبي على ملف مرشد افتراضي.':'Test inquiry for a fictional demo guide.'} ${requestForm.notes}`.slice(0,1000) : requestForm.notes})});
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || t.requestSent);
       setRequestResult(data.request?.id || 'sent');
@@ -290,8 +297,8 @@ function Website() {
 
         {tab === 'guides' && <section className="container page-section">
           <div className="page-title"><span className="eyebrow gold-text">{t.guides}</span><h1>{t.guidesTitle}</h1><p>{t.guidesSub}</p></div>
-          <div className="guide-intro"><div className="guide-intro-icon"><Headphones size={30}/></div><div><h3>{rtl ? 'تجربة محلية أقرب إليك' : 'A more local experience'}</h3><p>{rtl ? 'تُعرض هنا ملفات المرشدين بعد مراجعتها ونشرها.' : 'Guide profiles appear here after review and publication.'}</p></div></div>
-          {guideList.length ? <div className="guide-grid">{guideList.map(g => <article className="guide-card" key={g.id}><div className="guide-top"><div className="avatar">{g.initials}</div><span className="rating">{g.verified ? (rtl?'مرشد موثّق':'Verified guide') : (rtl?'ملف مرشد':'Guide profile')}</span></div><h3>{rtl ? (g.name_ar||g.name) : (g.name_en||g.name)}</h3><p className="muted">{g.specialty||''}</p><div className="guide-language"><Languages size={16}/>{g.languages||'—'}</div><div className="guide-bottom"><strong>{g.price||'—'}</strong><button className="btn-primary small" onClick={() => {setRequestGuide(g);setRequestResult('');setRequestForm({...requestForm,guide:g.name_ar||g.name,destination:''});}}>{t.book}</button></div></article>)}</div> : <div className="empty-state"><Users size={30}/><p>{rtl?'لا يوجد مرشدون منشورون حاليًا. يمكنك تقديم طلب للانضمام إلى شبكة المرشدين.':'No guides are currently published. You can apply to join the guide network.'}</p></div>}
+          <div className="guide-intro"><div className="guide-intro-icon"><Headphones size={30}/></div><div><h3>{rtl ? 'تجربة محلية أقرب إليك' : 'A more local experience'}</h3><p>{rtl ? 'الـ12 ملفًا الظاهرون الآن تجريبيون بأسماء وبيانات افتراضية، وليسوا مرشدين حقيقيين. طلب الجولة هنا للتجربة فقط.' : 'The 12 profiles currently shown are fictional demo profiles, not real guides. Tour inquiries here are for testing only.'}</p></div></div>
+          {guideList.length ? <div className="guide-grid">{guideList.map(g => <article className="guide-card" key={g.id}><div className="guide-top"><div className="avatar">{g.initials}</div><div className="guide-badges">{g.isDemo&&<span className="demo-chip">{rtl?'ملف تجريبي':'Demo profile'}</span>}<span className="rating">{g.verified ? (rtl?'مرشد موثّق':'Verified guide') : (rtl?'ملف مرشد':'Guide profile')}</span></div></div><h3>{rtl ? (g.name_ar||g.name) : (g.name_en||g.name)}</h3><p className="muted">{g.location ? `${g.location} · ` : ''}{g.specialty||''}</p><div className="guide-language"><Languages size={16}/>{g.languages||'—'}</div><div className="guide-bottom"><strong>{g.price||'—'}</strong><button className="btn-primary small" onClick={() => {setRequestGuide(g);setRequestResult('');setRequestForm({...requestForm,guide:g.name_ar||g.name,destination:''});}}>{g.isDemo ? (rtl?'جرّب طلب جولة':'Try demo inquiry') : t.book}</button></div></article>)}</div> : <div className="empty-state"><Users size={30}/><p>{rtl?'لا يوجد مرشدون منشورون حاليًا. يمكنك تقديم طلب للانضمام إلى شبكة المرشدين.':'No guides are currently published. You can apply to join the guide network.'}</p></div>}
           <p className="disclaimer"><ShieldCheck size={16}/>{t.verifiedNote}</p>
         </section>}
 
@@ -310,7 +317,24 @@ function Website() {
       <footer className="footer"><div className="container footer-inner"><div className="footer-brand"><span className="brand-mark"><MapPin size={20}/></span><div><strong>{rtl ? 'فيا لوكال' : 'VIA LOCAL'}</strong><small>{t.footer}</small></div></div><span className="footer-copy">© 2026 VIA LOCAL</span></div></footer>
 
       {notice && <div className="toast"><CheckCircle2 size={18}/>{notice}</div>}
-      {requestGuide && <div className="modal-backdrop" onClick={() => setRequestGuide(null)}><div className="request-modal" onClick={e => e.stopPropagation()}><button className="modal-close" onClick={() => setRequestGuide(null)} aria-label={t.close}><X/></button>{requestResult ? <div className="request-success"><CheckCircle2 size={42}/><h2>{rtl?'تم إرسال طلبك بنجاح':'Your inquiry was sent'}</h2><p>{rtl?'وصل طلبك إلى لوحة الإدارة. رقم الطلب:':'Your inquiry is now in the admin dashboard. Request ID:'}</p><code>{requestResult}</code><button className="btn-primary" onClick={()=>setRequestGuide(null)}>{t.close}</button></div> : <><div className="request-modal-head"><span className="eyebrow gold-text">{rtl?'طلب اهتمام بجولة':'Tour inquiry'}</span><h2>{rtl?'طلب جولة مع':'Request a tour with'} {rtl?(requestGuide.name_ar||requestGuide.name):(requestGuide.name_en||requestGuide.name)}</h2><p>{rtl?'املأ بياناتك وسيصل الطلب لفريق الإدارة لمراجعته. الإرسال لا يعني تأكيد الحجز.':'Complete the form and it will be sent to the admin team. This is not a booking confirmation.'}</p></div><form className="request-form" onSubmit={submitGuideRequest}><label>{rtl?'الاسم بالكامل *':'Full name *'}<input required maxLength="100" value={requestForm.name} onChange={e=>setRequestForm({...requestForm,name:e.target.value})}/></label><label>{rtl?'رقم الهاتف *':'Phone number *'}<input required maxLength="40" type="tel" value={requestForm.phone} onChange={e=>setRequestForm({...requestForm,phone:e.target.value})}/></label><label>{rtl?'البريد الإلكتروني':'Email'}<input type="email" maxLength="160" value={requestForm.email} onChange={e=>setRequestForm({...requestForm,email:e.target.value})}/></label><label>{rtl?'الوجهة المطلوبة *':'Destination *'}<input required maxLength="120" value={requestForm.destination} onChange={e=>setRequestForm({...requestForm,destination:e.target.value})} placeholder={rtl?'المدينة أو المكان':'City or place'}/></label><label>{rtl?'التاريخ المقترح':'Preferred date'}<input type="date" min={new Date().toISOString().slice(0,10)} value={requestForm.date} onChange={e=>setRequestForm({...requestForm,date:e.target.value})}/></label><label>{rtl?'عدد الأشخاص':'Number of guests'}<select value={requestForm.guests} onChange={e=>setRequestForm({...requestForm,guests:e.target.value})}>{Array.from({length:10},(_,i)=>i+1).map(n=><option value={n} key={n}>{n}</option>)}</select></label><label>{rtl?'لغة التواصل':'Preferred language'}<select value={requestForm.language} onChange={e=>setRequestForm({...requestForm,language:e.target.value})}><option>{rtl?'العربية':'Arabic'}</option><option>{rtl?'الإنجليزية':'English'}</option><option>{rtl?'أخرى':'Other'}</option></select></label><label className="request-notes">{rtl?'تفاصيل إضافية':'Additional details'}<textarea maxLength="1000" rows="3" value={requestForm.notes} onChange={e=>setRequestForm({...requestForm,notes:e.target.value})}/></label><button className="btn-primary request-submit" disabled={requestSending}>{requestSending?(rtl?'جارٍ الإرسال...':'Sending...'):(rtl?'إرسال الطلب':'Send inquiry')}<ArrowUpLeft size={17}/></button></form></>}</div></div>}
+      {locationDialogOpen && <div className="modal-backdrop" onClick={() => setLocationDialogOpen(false)}>
+        <section className="location-consent-modal" role="dialog" aria-modal="true" aria-labelledby="location-consent-title" onClick={e => e.stopPropagation()}>
+          <div className="location-consent-icon"><LocateFixed size={27}/></div>
+          <span className="eyebrow gold-text">VIA LOCAL · {rtl?'الخصوصية أولًا':'PRIVACY FIRST'}</span>
+          <h2 id="location-consent-title">{rtl?'تفعيل استخدام موقعك؟':'Use your location?'}</h2>
+          <p>{rtl?'سنستخدم موقعك الحالي داخل متصفحك فقط لترتيب الوجهات من الأقرب إلى الأبعد. لن نرسل الإحداثيات إلى خوادمنا ولن نحفظها في حسابك.' : 'Your current location will be used only in this browser to sort destinations from nearest to farthest. Coordinates are not sent to our servers or saved to your account.'}</p>
+          <ul>
+            <li>{rtl?'اختياري تمامًا، ويمكنك الاستكشاف بدونه.':'Completely optional; you can explore without it.'}</li>
+            <li>{rtl?'سيطلب المتصفح إذن الوصول بعد الضغط على متابعة.':'Your browser will ask for permission after you continue.'}</li>
+            <li>{rtl?'يمكنك إيقاف ترتيب الأقرب في أي وقت.':'You can turn off nearby sorting at any time.'}</li>
+          </ul>
+          <div className="location-consent-actions">
+            <button className="btn-primary" onClick={confirmLocation}>{rtl?'متابعة وطلب الإذن':'Continue and request permission'}</button>
+            <button className="btn-outline" onClick={() => setLocationDialogOpen(false)}>{rtl?'ليس الآن':'Not now'}</button>
+          </div>
+        </section>
+      </div>}
+      {requestGuide && <div className="modal-backdrop" onClick={() => setRequestGuide(null)}><div className="request-modal" onClick={e => e.stopPropagation()}><button className="modal-close" onClick={() => setRequestGuide(null)} aria-label={t.close}><X/></button>{requestResult ? <div className="request-success"><CheckCircle2 size={42}/><h2>{rtl?'تم حفظ طلبك بنجاح':'Your inquiry was saved'}</h2><p>{requestGuide?.isDemo ? (rtl?'تم حفظ طلب تجريبي على ملف افتراضي. لا يوجد مرشد حقيقي أو حجز فعلي. رقم الطلب:':'A demo inquiry for a fictional profile was saved. No real guide or booking exists. Request ID:') : (rtl?'وصل طلبك إلى لوحة الإدارة. رقم الطلب:':'Your inquiry is now in the admin dashboard. Request ID:')}</p><code>{requestResult}</code><button className="btn-primary" onClick={()=>setRequestGuide(null)}>{t.close}</button></div> : <><div className="request-modal-head"><span className="eyebrow gold-text">{rtl?'طلب اهتمام بجولة':'Tour inquiry'}</span><h2>{requestGuide.isDemo ? (rtl?'جرّب إرسال طلب مع':'Try a demo inquiry with') : (rtl?'طلب جولة مع':'Request a tour with')} {rtl?(requestGuide.name_ar||requestGuide.name):(requestGuide.name_en||requestGuide.name)}</h2><p>{requestGuide.isDemo ? (rtl?'تنبيه: هذا ملف مرشد افتراضي للتجربة فقط. لن يتم حجز جولة حقيقية، وسيظهر الطلب في لوحة الإدارة كطلب تجريبي.':'Note: this is a fictional guide profile for testing only. No real tour will be booked; the request will be marked as a demo in admin.') : (rtl?'املأ بياناتك وسيصل الطلب لفريق الإدارة لمراجعته. الإرسال لا يعني تأكيد الحجز.':'Complete the form and it will be sent to the admin team. This is not a booking confirmation.')}</p></div><form className="request-form" onSubmit={submitGuideRequest}><label>{rtl?'الاسم بالكامل *':'Full name *'}<input required maxLength="100" value={requestForm.name} onChange={e=>setRequestForm({...requestForm,name:e.target.value})}/></label><label>{rtl?'رقم الهاتف *':'Phone number *'}<input required maxLength="40" type="tel" value={requestForm.phone} onChange={e=>setRequestForm({...requestForm,phone:e.target.value})}/></label><label>{rtl?'البريد الإلكتروني':'Email'}<input type="email" maxLength="160" value={requestForm.email} onChange={e=>setRequestForm({...requestForm,email:e.target.value})}/></label><label>{rtl?'الوجهة المطلوبة *':'Destination *'}<input required maxLength="120" value={requestForm.destination} onChange={e=>setRequestForm({...requestForm,destination:e.target.value})} placeholder={rtl?'المدينة أو المكان':'City or place'}/></label><label>{rtl?'التاريخ المقترح':'Preferred date'}<input type="date" min={new Date().toISOString().slice(0,10)} value={requestForm.date} onChange={e=>setRequestForm({...requestForm,date:e.target.value})}/></label><label>{rtl?'عدد الأشخاص':'Number of guests'}<select value={requestForm.guests} onChange={e=>setRequestForm({...requestForm,guests:e.target.value})}>{Array.from({length:10},(_,i)=>i+1).map(n=><option value={n} key={n}>{n}</option>)}</select></label><label>{rtl?'لغة التواصل':'Preferred language'}<select value={requestForm.language} onChange={e=>setRequestForm({...requestForm,language:e.target.value})}><option>{rtl?'العربية':'Arabic'}</option><option>{rtl?'الإنجليزية':'English'}</option><option>{rtl?'أخرى':'Other'}</option></select></label><label className="request-notes">{rtl?'تفاصيل إضافية':'Additional details'}<textarea maxLength="1000" rows="3" value={requestForm.notes} onChange={e=>setRequestForm({...requestForm,notes:e.target.value})}/></label><button className="btn-primary request-submit" disabled={requestSending}>{requestSending?(rtl?'جارٍ الإرسال...':'Sending...'):(requestGuide.isDemo ? (rtl?'إرسال طلب تجريبي':'Send demo inquiry') : (rtl?'إرسال الطلب':'Send inquiry'))}<ArrowUpLeft size={17}/></button></form></>}</div></div>}
 
       {selectedPlace && <div className="modal-backdrop" onClick={() => setSelectedPlace(null)}><div className="place-modal" onClick={e => e.stopPropagation()}><button className="modal-close" onClick={() => setSelectedPlace(null)} aria-label={t.close}><X/></button><img src={selectedPlace.image} alt={localizedPlace(selectedPlace,lang).name} onError={e=>{const el=e.currentTarget;el.style.display='none';el.parentElement?.classList.add('image-unavailable');el.parentElement?.setAttribute('data-fallback',lang==='ar'?'الصورة غير متاحة':'Image unavailable')}}/><div className="modal-body"><span className="eyebrow gold-text">{localizedPlace(selectedPlace,lang).city} · {localizedPlace(selectedPlace,lang).category}</span><h2>{localizedPlace(selectedPlace,lang).name}</h2><p>{localizedPlace(selectedPlace,lang).description}</p><div className="modal-facts"><span>{selectedPlace.ratingAvg ? <><Star size={14} fill="currentColor"/>{selectedPlace.ratingAvg} ({selectedPlace.reviewCount||0})</> : t.noRating}</span><span><MapPin size={16}/>{localizedPlace(selectedPlace,lang).distance}</span><span><Accessibility size={16}/>{selectedPlace.accessible ? t.accessible : (rtl ? 'لم يتم تأكيد التجهيزات' : 'Not verified')}</span></div><div className="destination-map"><iframe title={rtl?'خريطة الوجهة':'Destination map'} loading="lazy" src={'https://maps.google.com/maps?q='+encodeURIComponent(localizedPlace(selectedPlace,lang).name+', '+localizedPlace(selectedPlace,lang).city)+'&output=embed'} referrerPolicy="no-referrer-when-downgrade"></iframe></div>{liveCatalog.reviews?.filter(r=>r.destination_id===selectedPlace.id).slice(0,3).map(r=><div className="destination-review" key={r.id}><strong>{r.author_name}</strong><span><Star size={12} fill="currentColor"/> {r.rating}/5</span><p>{r.comment}</p></div>)}<div className="modal-actions"><button className="btn-primary" onClick={() => {const placeId=selectedPlace.id;const wasSaved=favorites.includes(placeId);toggleFavorite(placeId);setSelectedPlace(null);notify(wasSaved?t.unsaved:t.saved)}}>{favorites.includes(selectedPlace.id) ? t.savedLabel : t.save}<Heart size={17}/></button><button className="btn-outline" onClick={() => { if (!('speechSynthesis' in window)) return notify(rtl?'ميزة الصوت غير مدعومة.':'Speech is not supported.'); window.speechSynthesis.cancel(); const utterance=new SpeechSynthesisUtterance(localizedPlace(selectedPlace,lang).description||localizedPlace(selectedPlace,lang).name); utterance.lang=rtl?'ar-EG':'en-US'; window.speechSynthesis.speak(utterance); }}>{rtl?'استمع للوصف':'Listen'}<Volume2 size={17}/></button><button className="btn-outline" onClick={() => sharePlace(selectedPlace)}>{rtl?'مشاركة':'Share'}<Globe2 size={17}/></button></div></div></div></div>}
     </div>
