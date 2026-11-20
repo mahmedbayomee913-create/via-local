@@ -107,7 +107,12 @@ function Website() {
       if (!response.ok) throw new Error('Source unavailable');
       const data = await response.json();
       const items = Array.isArray(data.items) ? data.items : [];
-      setWorldPlaces(previous => [...previous, ...items.filter(item => !previous.some(p => p.id === item.id))]);
+      setWorldPlaces(previous => {
+        const additions = items
+          .filter(item => !previous.some(existing => existing.id === item.id))
+          .map(item => ({ ...item, image: item.image || item.image_url || '' }));
+        return [...previous, ...additions];
+      });
       setWorldOffset(Number(data.nextOffset ?? (worldOffset + 80)));
       setWorldHasMore(Boolean(data.hasMore) && Number(data.nextOffset ?? (worldOffset + 80)) < 3000);
     } catch { setWorldError(lang === 'ar' ? 'تعذّر تحميل الوجهات العالمية الآن. حاول مرة أخرى.' : 'World destinations could not load. Try again.'); }
