@@ -140,7 +140,7 @@ function App() {
         {tab === 'home' && <>
           <section className="hero">
             <div className="hero-image"></div>
-            <div className="container hero-content"><div className="hero-play-wrap"><button className="hero-play" aria-label="الفيديو التعريفي" onClick={() => notify("الفيديو التعريفي سيتم إضافته قريبًا")}><span className="play-triangle"/></button></div>
+            <div className="container hero-content">
               <span className="eyebrow hero-label"><Sparkles size={15}/>منصة سياحية ذكية · توثيق السعر المناسب</span>
               <h1>سفر آمن وشامل...<br/><em>انتم إلى المكان</em></h1>
               <p className="hero-description">فيا لوكال يجمع الاستكشاف الذكي للوجهات، وحجز المرشدين السياحيين المحليين، وخدمات الوصول الشامل لذوي الاحتياجات الخاصة — في تجربة واحدة مريحة وممتعة للجميع.</p>
