@@ -156,6 +156,7 @@ create table if not exists public.guides (
   price numeric(12,2) not null default 0 check (price >= 0),
   currency text not null default 'USD',
   avatar_url text,
+  is_demo boolean not null default false,
   verified boolean not null default false,
   published boolean not null default false,
   created_at timestamptz not null default now(),
