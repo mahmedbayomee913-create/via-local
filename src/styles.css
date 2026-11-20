@@ -38,3 +38,11 @@
 .load-more-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:30px auto 12px;text-align:center}
 .load-more-wrap button{min-width:210px}
 .load-more-wrap small{color:var(--muted,#777);font-size:12px}
+
+/* Graceful fallback for missing destination photos */
+.place-image-wrap.image-unavailable::before{content:attr(data-fallback);position:absolute;inset:0;display:grid;place-items:center;color:#78666c;font-size:12px;font-weight:800;background:linear-gradient(135deg,#f1e9df,#e5d8cc);z-index:1}
+.place-image-wrap.image-unavailable::after{display:none}
+.place-modal.image-unavailable{position:relative}
+.place-modal.image-unavailable::before{content:attr(data-fallback);height:235px;display:grid;place-items:center;color:#78666c;font-size:12px;font-weight:800;background:linear-gradient(135deg,#f1e9df,#e5d8cc)}
+.place-modal.image-unavailable>img{display:none}
+.place-modal.image-unavailable .modal-close{z-index:2}

@@ -33,7 +33,7 @@ async function getPageDetails(pageIds){
     const data=await wikiFetch({pageids:missing.join('|'),prop:'pageimages|extracts|coordinates',piprop:'thumbnail',pithumbsize:'1200',exintro:'1',explaintext:'1',exchars:'450'});
     for(const page of Object.values(data.query?.pages||{}))detailCache.set(page.pageid,{pageid:page.pageid,title:page.title,description:page.extract||'',image:page.thumbnail?.source||'',coords:page.coordinates?.[0]||null});
   }));
-  return pageIds.map(id=>detailCache.get(id)).filter(p=>p&&p.image);
+  return pageIds.map(id=>detailCache.get(id)).filter(p=>p&&p.image&&p.coords);
 }
 export default async function handler(req,res){
   if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});
@@ -44,7 +44,7 @@ export default async function handler(req,res){
     const batch=members.slice(offset,offset+limit);
     const pages=await getPageDetails(batch.map(p=>p.pageid));
     const categoryById=new Map(batch.map(p=>[p.pageid,p.category]));
-    const items=pages.map(p=>({id:'wiki-'+p.pageid,slug:String(p.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),name_ar:p.title,name_en:p.title,city_ar:'',city_en:'',country_ar:'',country_en:'',category:categoryById.get(p.pageid)||'world',description_ar:p.description,description_en:p.description,image_url:p.image,tags:['Worldwide','Wikipedia'],family_friendly:false,nature:false,accessible:false,latitude:p.coords?.lat??null,longitude:p.coords?.lon??null,featured:false,published:true,source_url:'https://en.wikipedia.org/wiki/'+encodeURIComponent(p.title.replace(/ /g,'_'))}));
+    const items=pages.filter(p=>!(/^(list of |theories? of |conservation and restoration|archaeological site$|beach$|canopy walkway$|circular rampart$|abandoned amusement park$)/i.test(p.title))).map(p=>({id:'wiki-'+p.pageid,slug:String(p.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),name_ar:p.title,name_en:p.title,city_ar:'',city_en:'',country_ar:'',country_en:'',category:categoryById.get(p.pageid)||'world',description_ar:p.description,description_en:p.description,image_url:p.image,tags:['Worldwide','Wikipedia'],family_friendly:false,nature:false,accessible:false,latitude:p.coords?.lat??null,longitude:p.coords?.lon??null,featured:false,published:true,source_url:'https://en.wikipedia.org/wiki/'+encodeURIComponent(p.title.replace(/ /g,'_'))}));
     const nextOffset=offset+batch.length;
     return res.status(200).json({items,offset,nextOffset,limit,total:members.length,hasMore:nextOffset<members.length,source:'Wikipedia / Wikimedia Commons'});
   }catch(error){return res.status(502).json({error:'World destination source unavailable',detail:error?.message||'Fetch failed'});}
