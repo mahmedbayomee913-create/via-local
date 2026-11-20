@@ -118,11 +118,12 @@ function App() {
 
   return (
     <div className={rtl ? 'app' : 'app ltr'} dir={rtl ? 'rtl' : 'ltr'}>
+      <div className="announcement-bar"><Sparkles size={13}/><span>منصة فيا لوكال — سفر آمن وشامل، ومرشد محلي يفتح لك أبواب المكان</span><Sparkles size={13}/></div>
       <header className="header">
         <div className="container header-inner">
           <button className="brand" onClick={() => setTab('home')} aria-label="Via Local home">
-            <span className="brand-mark">V</span>
-            <span className="brand-name">VIA <b>LOCAL</b><small>DISCOVER · CONNECT · EXPERIENCE</small></span>
+            <span className="brand-mark"><MapPin size={25} strokeWidth={2.5}/></span>
+            <span className="brand-name arabic-brand">فيا لوكال<small>VIA LOCAL</small></span>
           </button>
           <nav className="desktop-nav">
             {navItems.map(([id, label, Icon]) => <button key={id} className={tab === id ? 'nav-link active' : 'nav-link'} onClick={() => setTab(id)}><Icon size={17}/>{label}</button>)}
@@ -139,10 +140,10 @@ function App() {
         {tab === 'home' && <>
           <section className="hero">
             <div className="hero-image"></div>
-            <div className="container hero-content">
-              <span className="eyebrow"><Sparkles size={15}/>{t.demo} · VIA LOCAL</span>
-              <h1>{t.tagline}</h1>
-              <p>{t.sub}</p>
+            <div className="container hero-content"><div className="hero-play-wrap"><button className="hero-play" aria-label="الفيديو التعريفي" onClick={() => notify("الفيديو التعريفي سيتم إضافته قريبًا")}><span className="play-triangle"/></button></div>
+              <span className="eyebrow hero-label"><Sparkles size={15}/>منصة سياحية ذكية · توثيق السعر المناسب</span>
+              <h1>سفر آمن وشامل...<br/><em>انتم إلى المكان</em></h1>
+              <p className="hero-description">فيا لوكال يجمع الاستكشاف الذكي للوجهات، وحجز المرشدين السياحيين المحليين، وخدمات الوصول الشامل لذوي الاحتياجات الخاصة — في تجربة واحدة مريحة وممتعة للجميع.</p>
               <div className="hero-search">
                 <Search size={20}/>
                 <input value={query} onChange={e => {setQuery(e.target.value);setTab('explore')}} placeholder={t.search}/>
