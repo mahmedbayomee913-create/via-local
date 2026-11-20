@@ -72,7 +72,7 @@ function App() {
   const rtl = lang === 'ar';
 
   const filteredPlaces = useMemo(() => places.filter(p => {
-    const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase());
+    const lp = localizedPlace(p, lang); const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')} ${lp.name} ${lp.city} ${lp.category} ${lp.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase());
     const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'accessible' && p.accessible);
     return matchesQuery && matchesFilter;
   }), [query, filter]);
