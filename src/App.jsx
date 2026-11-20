@@ -73,7 +73,7 @@ function App() {
 
   const filteredPlaces = useMemo(() => places.filter(p => {
     const lp = localizedPlace(p, lang); const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')} ${lp.name} ${lp.city} ${lp.category} ${lp.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي'].includes(p.category));
+    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي','Archaeological','Historic','Heritage','Cultural'].includes(lp.category));
     return matchesQuery && matchesFilter;
   }), [query, filter, lang]);
 
