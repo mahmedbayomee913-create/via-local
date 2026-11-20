@@ -34,3 +34,7 @@
 @media(max-width:680px){.access-map-live iframe{height:220px}}
 
 .destination-review{display:grid;grid-template-columns:1fr auto;gap:5px 10px;padding:10px 12px;margin:8px 0;border:1px solid #eee6de;border-radius:11px;background:#fffaf5}.destination-review strong{font-size:11px;color:#44263a}.destination-review span{display:flex;align-items:center;gap:4px;font-size:10px;color:#a47c36}.destination-review p{grid-column:1/-1;margin:0;font-size:11px;line-height:1.7;color:#756a6e}
+
+.load-more-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin:30px auto 12px;text-align:center}
+.load-more-wrap button{min-width:210px}
+.load-more-wrap small{color:var(--muted,#777);font-size:12px}
