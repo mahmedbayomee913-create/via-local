@@ -24,3 +24,11 @@
 
 .workspace-passport-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.workspace-passport-actions label{display:flex;flex-direction:column;gap:5px;color:#75666d;font-size:10px;font-weight:800}.workspace-passport-actions input{width:92px;min-height:36px;box-sizing:border-box;border:1px solid #e6ded8;border-radius:9px;padding:7px 9px;background:#fff;color:#30252a;font:inherit;font-size:12px}.workspace-passport-actions select{min-height:36px}.workspace-passport-actions button{min-height:36px;white-space:nowrap}
 @media(max-width:760px){.workspace-passport-actions{width:100%;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}.workspace-passport-actions label,.workspace-passport-actions input,.workspace-passport-actions select,.workspace-passport-actions button{width:100%;box-sizing:border-box}.workspace-passport-actions input{min-height:42px;font-size:16px}}
+
+/* Passport moderation row layout: keep fields and actions aligned without overflow. */
+.workspace-row:has(.workspace-passport-actions){align-items:flex-start;gap:16px;}
+.workspace-row:has(.workspace-passport-actions) .workspace-item-main{min-width:220px;}
+.workspace-passport-actions{max-width:420px;}
+.workspace-passport-actions select{min-width:145px;max-width:100%;box-sizing:border-box;}
+.workspace-passport-actions button:disabled{opacity:.6;cursor:wait;}
+@media(max-width:760px){.workspace-row:has(.workspace-passport-actions){align-items:stretch;}.workspace-row:has(.workspace-passport-actions) .workspace-item-main{min-width:0;}.workspace-passport-actions select{width:100%;min-width:0;}}
