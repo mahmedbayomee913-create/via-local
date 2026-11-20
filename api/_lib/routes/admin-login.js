@@ -1,5 +1,7 @@
 import { createSession, cookie, clearCookie, isAdmin } from '../auth.js';
+import { timingSafeEqual } from 'node:crypto';
 const attempts = new Map();
+function matchesPassword(candidate, expected) { const a = Buffer.from(candidate); const b = Buffer.from(expected); return a.length === b.length && timingSafeEqual(a, b); }
 function clientKey(req){ return String(req.headers['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0].trim(); }
 export default function handler(req, res) {
   if (req.method === 'GET') {
@@ -11,7 +13,7 @@ export default function handler(req, res) {
     const expected = process.env.ADMIN_PASSWORD;
     const password = String(req.body?.password || '');
     if (!expected || expected.length < 12) return res.status(503).json({ error: 'Admin password is not configured securely.' });
-    if (password !== expected) { const next={count:(record?.count||0)+1,blockedUntil:0}; if(next.count>=8) next.blockedUntil=now+15*60*1000; attempts.set(key,next); for(const [k,v] of attempts)if(v.blockedUntil&&v.blockedUntil<now)attempts.delete(k); return res.status(401).json({ error: 'Incorrect password' }); }
+    if (!matchesPassword(password, expected)) { const next={count:(record?.count||0)+1,blockedUntil:0}; if(next.count>=8) next.blockedUntil=now+15*60*1000; attempts.set(key,next); for(const [k,v] of attempts)if(v.blockedUntil&&v.blockedUntil<now)attempts.delete(k); return res.status(401).json({ error: 'Incorrect password' }); }
     attempts.delete(key);
     res.setHeader('Set-Cookie', cookie(createSession(), 8 * 60 * 60));
     return res.status(200).json({ ok: true });
