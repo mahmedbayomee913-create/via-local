@@ -69,7 +69,11 @@ function Website() {
   const [notice, setNotice] = useState('');
   const [locationText, setLocationText] = useState('');
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [mobileMenu, setMobileMenu] = useState(false);\n  const [requestGuide, setRequestGuide] = useState(null);\n  const [requestSending, setRequestSending] = useState(false);\n  const [requestResult, setRequestResult] = useState('');\n  const [requestForm, setRequestForm] = useState({name:'',phone:'',email:'',destination:'',date:'',guests:'1',language:'العربية',notes:''});
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const [requestGuide, setRequestGuide] = useState(null);
+  const [requestSending, setRequestSending] = useState(false);
+  const [requestResult, setRequestResult] = useState('');
+  const [requestForm, setRequestForm] = useState({name:'',phone:'',email:'',destination:'',date:'',guests:'1',language:'العربية',notes:''});
   useEffect(() => { try { localStorage.setItem('via-local:lang', lang); } catch {} }, [lang]);
   const t = copy[lang];
   const rtl = lang === 'ar';
