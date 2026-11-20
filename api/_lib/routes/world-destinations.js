@@ -1,6 +1,5 @@
 const CACHE_MS = 30 * 60 * 1000;
-let cachedItems = null;
-let cachedAt = 0;
+const cache = new Map();
 
 const TYPES = [
   'Q570116', 'Q839954', 'Q4989906', 'Q9259',
@@ -12,23 +11,25 @@ function imageUrl(raw) {
   return raw.replace('http://commons.wikimedia.org/', 'https://commons.wikimedia.org/');
 }
 
-async function fetchWorldPlaces() {
-  if (cachedItems && Date.now() - cachedAt < CACHE_MS) return cachedItems;
+async function fetchWorldPlaces(offset, limit) {
+  const cacheKey = offset + ':' + limit;
+  const cached = cache.get(cacheKey);
+  if (cached && Date.now() - cached.at < CACHE_MS) return cached.items;
   const query = `SELECT DISTINCT ?place ?placeLabel ?placeLabelAr ?description ?descriptionAr ?image ?coord ?countryLabel WHERE {
     VALUES ?type { ${TYPES.map(t => 'wd:' + t).join(' ')} }
-    ?place wdt:P31/wdt:P279* ?type; wdt:P18 ?image; wdt:P625 ?coord.
+    ?place wdt:P31 ?type; wdt:P18 ?image; wdt:P625 ?coord.
     OPTIONAL { ?place schema:description ?description FILTER(LANG(?description) = "en") }
     OPTIONAL { ?place schema:description ?descriptionAr FILTER(LANG(?descriptionAr) = "ar") }
     OPTIONAL { ?place rdfs:label ?placeLabelAr FILTER(LANG(?placeLabelAr) = "ar") }
     OPTIONAL { ?place wdt:P17 ?country. ?country rdfs:label ?countryLabel FILTER(LANG(?countryLabel) = "en") }
     SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-  } ORDER BY ?placeLabel LIMIT 2000`;
+  } ORDER BY ?placeLabel LIMIT ${limit} OFFSET ${offset}`;
   const url = 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(query) + '&format=json';
   const response = await fetch(url, { headers: { Accept: 'application/sparql-results+json', 'User-Agent': 'VIA-LOCAL/1.0 (destination discovery; contact via-local.vercel.app)' }, signal: AbortSignal.timeout(14000) });
   if (!response.ok) throw new Error('Wikidata returned ' + response.status);
   const json = await response.json();
   const seen = new Set();
-  cachedItems = (json.results?.bindings || []).map(row => {
+  const items = (json.results?.bindings || []).map(row => {
     const qid = row.place.value.split('/').pop();
     if (seen.has(qid)) return null;
     seen.add(qid);
@@ -46,18 +47,17 @@ async function fetchWorldPlaces() {
       featured: false, published: true, source_url: row.place.value
     };
   }).filter(Boolean);
-  cachedAt = Date.now();
-  return cachedItems;
+  cache.set(cacheKey, { items, at: Date.now() });
+  return items;
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const all = await fetchWorldPlaces();
     const offset = Math.max(0, Math.min(2000, Number.parseInt(req.query?.offset || '0', 10) || 0));
     const limit = Math.max(1, Math.min(100, Number.parseInt(req.query?.limit || '80', 10) || 80));
-    const items = all.slice(offset, offset + limit);
-    return res.status(200).json({ items, offset, limit, total: Math.min(all.length, 2000), hasMore: offset + items.length < Math.min(all.length, 2000), source: 'Wikidata / Wikimedia Commons' });
+    const items = await fetchWorldPlaces(offset, limit);
+    return res.status(200).json({ items, offset, limit, total: null, hasMore: items.length === limit && offset + items.length < 2000, source: 'Wikidata / Wikimedia Commons' });
   } catch (error) {
     return res.status(502).json({ error: 'World destination source unavailable', detail: error?.message || 'Fetch failed' });
   }
