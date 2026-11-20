@@ -64,6 +64,7 @@ export default function AdminWorkspace({ section, lang='ar', type='destinations'
   const [manualBooking,setManualBooking] = useState({experience_id:'',customer_name:'',customer_phone:'',customer_email:'',booking_date:'',guests:1,notes:'',status:'pending'});
   const [showManualBooking,setShowManualBooking] = useState(false);
   const [savingBooking,setSavingBooking] = useState(false);
+  const [passportSavingId,setPassportSavingId] = useState('');
   const t = (ar,en) => rtl ? ar : en;
 
   async function load() {
@@ -190,10 +191,13 @@ export default function AdminWorkspace({ section, lang='ar', type='destinations'
     const endpoint = kind==='bookings' ? `/api/admin/bookings/${row.id}` : kind==='applications' ? `/api/admin/guide-applications/${row.id}` : kind==='passport' ? `/api/admin/passport/${row.id}` : `/api/admin/reviews/${row.id}`;
     const body = kind==='reviews' ? {approved:value} : kind==='passport' ? {status:value,points:row.points} : {status:value};
     try {
+      if(kind==='passport')setPassportSavingId(row.id);
+      setError('');
       const r=await fetch(endpoint,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const d=await r.json(); if(!r.ok) throw new Error(d.error || 'Update failed.');
       await load();
     } catch(e) { setError(e.message || 'Update failed.'); }
+    finally {if(kind==='passport')setPassportSavingId('');}
   }
 
   const filtered = items.filter(row => JSON.stringify(row).toLowerCase().includes(search.toLowerCase()));
@@ -276,8 +280,8 @@ export default function AdminWorkspace({ section, lang='ar', type='destinations'
       <div className="workspace-item-main"><strong>{rtl?(v.destination?.name_ar||t('وجهة غير متاحة','Unknown destination')):(v.destination?.name_en||t('Unknown destination','Unknown destination'))}</strong><small>{t('المسافر: ','Traveller: ')}{v.profile?.full_name||v.user_id}</small><small>{t('تاريخ الزيارة: ','Visit date: ')}{v.visited_on||'—'} · {t('النقاط الحالية: ','Current points: ')}{v.points??0}</small>{v.note&&<small>{v.note}</small>}</div>
       <div className="workspace-passport-actions">
         <label>{t('النقاط','Points')}<input type="number" min="0" max="100000" step="1" value={v.points??0} onChange={e=>setItems(previous=>previous.map(item=>item.id===v.id?{...item,points:e.target.value===''?0:Number(e.target.value)}:item))}/></label>
-        <select value={v.status} onChange={e=>patchStatus('passport',v,e.target.value)}>{passportStatuses.map(s=><option value={s} key={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select>
-        <button className="workspace-quiet" onClick={()=>patchStatus('passport',v,v.status)}><Save size={15}/>{t('حفظ النقاط','Save points')}</button>
+        <select value={v.status} onChange={e=>setItems(previous=>previous.map(item=>item.id===v.id?{...item,status:e.target.value}:item))}>{passportStatuses.map(s=><option value={s} key={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select>
+        <button className="workspace-quiet" onClick={()=>patchStatus('passport',v,v.status)} disabled={passportSavingId===v.id}><Save size={15}/>{passportSavingId===v.id?t('جارٍ الحفظ...','Saving...'):t('حفظ التعديلات','Save changes')}</button>
       </div>
     </article>)}
     {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد زيارات مرسلة حتى الآن.','No passport visits have been submitted yet.')}</div>}</div>
