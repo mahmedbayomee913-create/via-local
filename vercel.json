@@ -1,5 +1,14 @@
 {
   "rewrites": [
-    { "source": "/admin", "destination": "/" }
+    {
+      "source": "/api/:first/:rest*",
+      "destination": "/api/dispatch?route=:first/:rest*"
+    },
+    {
+      "0": {
+        "source": "/admin",
+        "destination": "/"
+      }
+    }
   ]
 }

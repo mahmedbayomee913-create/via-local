@@ -26,7 +26,8 @@ import customerBookings from './routes/customer-bookings.js';
 export default async function handler(req, res) {
   const url = new URL(req.url || '/', 'https://via-local.invalid');
   const pathParts = url.pathname.split('/').filter(Boolean);
-  const parts = pathParts[0] === 'api' ? pathParts.slice(1) : pathParts;
+  const originalParts = pathParts[0] === 'api' ? pathParts.slice(1) : pathParts;
+  const parts = req.query.route ? String(req.query.route).split('/').filter(Boolean) : originalParts;
   req.query = { ...(req.query || {}), ...Object.fromEntries(url.searchParams.entries()) };
 
   const [section, sub, id] = parts;
