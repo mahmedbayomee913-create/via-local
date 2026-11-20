@@ -26,6 +26,7 @@ export default function TravelHub({ lang='ar' }) {
   const [accountMode,setAccountMode] = useState('login');
   const [pendingConfirmationEmail,setPendingConfirmationEmail] = useState('');
   const [user,setUser] = useState(null);
+  const [customerLoading,setCustomerLoading] = useState(true);
   const [profile,setProfile] = useState({full_name:'',phone:''});
   const [bookings,setBookings] = useState([]);
   const [visits,setVisits] = useState([]);
@@ -42,12 +43,17 @@ export default function TravelHub({ lang='ar' }) {
     finally { setLoadingCatalog(false); }
   }
   async function loadCustomer() {
-    const r=await fetch('/api/customer/me');
-    if(!r.ok){setUser(null);return false;}
-    const d=await r.json();setUser(d.user);setProfile({full_name:d.profile?.full_name||'',phone:d.profile?.phone||''});
-    const br=await fetch('/api/customer/bookings'); if(br.ok){const bd=await br.json();setBookings(bd.bookings||[]);}
-    const pr=await fetch('/api/passport'); if(pr.ok){const pd=await pr.json();setVisits(pd.visits||[]);setPoints(pd.points||0);}
-    return true;
+    setCustomerLoading(true);
+    try {
+      const r=await fetch('/api/customer/me',{credentials:'same-origin'});
+      if(!r.ok){setUser(null);setBookings([]);setVisits([]);setPoints(0);return false;}
+      const d=await r.json();setUser(d.user);setProfile({full_name:d.profile?.full_name||'',phone:d.profile?.phone||''});
+      const [br,pr]=await Promise.all([fetch('/api/customer/bookings',{credentials:'same-origin'}),fetch('/api/passport',{credentials:'same-origin'})]);
+      if(br.ok){const bd=await br.json();setBookings(bd.bookings||[]);}
+      if(pr.ok){const pd=await pr.json();setVisits(pd.visits||[]);setPoints(pd.points||0);}
+      return true;
+    } catch { setUser(null);setBookings([]);setVisits([]);setPoints(0);return false; }
+    finally {setCustomerLoading(false);}
   }
   useEffect(()=>{loadCatalog();loadCustomer();},[]);
 
@@ -142,7 +148,7 @@ export default function TravelHub({ lang='ar' }) {
 
   return <section className="travel-hub container" dir={rtl?'rtl':'ltr'}>
     <div className="hub-intro"><div><span className="eyebrow gold-text">VIA LOCAL TRAVEL HUB</span><h1>{t('رحلتك تبدأ من هنا','Your journey starts here')}</h1><p>{t('خطط، احجز، تابع رحلاتك، واجمع ذكرياتك في حساب واحد.','Plan, book, track your trips and collect your memories in one place.')}</p></div><div className="hub-intro-mark"><PlaneTakeoff size={30}/></div></div>
-    <nav className="hub-tabs">{tabs.map(([id,ar,en,Icon])=><button key={id} className={tab===id?'active':''} onClick={()=>setTab(id)}><Icon size={16}/>{t(ar,en)}</button>)}</nav>
+    <nav className="hub-tabs">{tabs.map(([id,ar,en,Icon])=><button key={id} className={tab===id?'active':''} onClick={()=>{setTab(id);if(id==='passport'&&!user)loadCustomer();}}><Icon size={16}/>{t(ar,en)}</button>)}</nav>
     {notice&&<div className="hub-notice"><CheckCircle2 size={17}/>{notice}</div>}
 
     {tab==='planner'&&<div className="hub-card"><div className="hub-card-title"><Compass size={20}/><div><h2>{t('مخطط الرحلات الذكي','Smart trip planner')}</h2><p>{t('أنشئ برنامجًا أوليًا حسب المدينة والمدة واهتماماتك، باستخدام الوجهات المنشورة في الموقع.','Build a starter itinerary using published destinations, your city, trip length and interests.')}</p></div></div>
@@ -181,7 +187,7 @@ export default function TravelHub({ lang='ar' }) {
     </div>}
 
     {tab==='passport'&&<div className="hub-card"><div className="hub-card-title"><Award size={20}/><div><h2>{t('VIA LOCAL Passport','VIA LOCAL Passport')}</h2><p>{t('سجّل الأماكن التي زرتها واجمع نقاطًا بعد التحقق من الزيارات.','Record places you have visited and collect points after visits are verified.')}</p></div></div>
-      {!user?<div className="hub-empty">{t('سجّل الدخول أولًا لاستخدام جواز السفر الرقمي.','Sign in first to use your digital passport.')} <button className="btn-outline" onClick={()=>setTab('account')}>{t('حسابي','My account')}</button></div>:<>
+      {customerLoading&&!user?<div className="hub-empty">{t('جارٍ التحقق من تسجيل دخولك...','Checking your sign-in status...')} <button className="btn-outline" onClick={loadCustomer} disabled={customerLoading}>{t('تحقق مرة أخرى','Check again')}</button></div>:!user?<div className="hub-empty">{t('لم يتم العثور على جلسة دخول نشطة. لو أنشأت حسابًا بالفعل، اختَر تسجيل الدخول بنفس البريد وكلمة المرور بدل إنشاء حساب جديد.','No active sign-in session was found. If you already created an account, sign in using the same email and password instead of creating another account.')} <button className="btn-outline" onClick={()=>{setAccountMode('login');setTab('account')}}>{t('تسجيل الدخول','Sign in')}</button> <button className="btn-outline" onClick={loadCustomer} disabled={customerLoading}>{t('إعادة التحقق','Retry session check')}</button></div>:<>
         <div className="passport-score"><Award size={26}/><div><strong>{points}</strong><span>{t('نقطة معتمدة','verified points')}</span></div></div>
         <form className="hub-form" onSubmit={submitVisit}>{field(t('الوجهة التي زرتها','Destination visited'),<select required value={passportForm.destination_id} onChange={e=>setPassportForm({...passportForm,destination_id:e.target.value})}><option value="">{t('اختر وجهة','Choose a destination')}</option>{catalog.destinations.map(d=><option value={d.id} key={d.id}>{placeName(d)}</option>)}</select>,true)}{field(t('تاريخ الزيارة','Visit date'),<input type="date" required value={passportForm.visited_on} onChange={e=>setPassportForm({...passportForm,visited_on:e.target.value})}/>)}{field(t('ملاحظات','Notes'),<textarea rows="2" value={passportForm.note} onChange={e=>setPassportForm({...passportForm,note:e.target.value})}/>,true)}<button className="btn-primary" disabled={busy}>{t('إضافة زيارة','Add visit')}</button></form>
         <div className="hub-list">{visits.map(v=><article className="hub-list-row" key={v.id}><strong>{v.destination?.[rtl?'name_ar':'name_en']||v.destination_id}</strong><span>{v.visited_on}</span><b>{t(v.status==='verified'?'معتمدة':v.status==='rejected'?'مرفوضة':'قيد المراجعة',v.status==='verified'?'Verified':v.status==='rejected'?'Rejected':'Pending')}</b></article>)}</div>
