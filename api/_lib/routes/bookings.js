@@ -1,5 +1,6 @@
 import { db } from '../db.js';
 import { getCustomer } from '../customer.js';
+import { isValidISODate } from '../validation.js';
 
 const clean = (v, max) => String(v ?? '').trim().slice(0, max);
 export default async function handler(req, res) {
@@ -13,7 +14,7 @@ export default async function handler(req, res) {
     const guests = Number(body.guests || 1);
     const experienceId = clean(body.experience_id, 36);
     if (!/^[0-9a-f-]{36}$/i.test(experienceId)) return res.status(400).json({ error: 'Choose a valid experience.' });
-    if (!customer_name || !customer_phone || !/^\d{4}-\d{2}-\d{2}$/.test(booking_date) || !experienceId || !Number.isInteger(guests) || guests < 1 || guests > 30) {
+    if (!customer_name || !customer_phone || !isValidISODate(booking_date) || !experienceId || !Number.isInteger(guests) || guests < 1 || guests > 30) {
       return res.status(400).json({ error: 'Please complete the required booking details.' });
     }
     if (booking_date < new Date().toISOString().slice(0, 10)) return res.status(400).json({ error: 'The selected date is in the past.' });
