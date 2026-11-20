@@ -45,9 +45,10 @@ const statusEn = {pending:'Pending',accepted:'Accepted',confirmed:'Confirmed',ca
 const money = (v,c='USD') => new Intl.NumberFormat('en',{style:'currency',currency:c,maximumFractionDigits:2}).format(Number(v||0));
 const blankFor = fields => Object.fromEntries(fields.map(([key,,,,required]) => [key, key==='published'||key==='verified'||key==='is_demo'||key==='featured'||key==='family_friendly'||key==='nature'||key==='halal_options'||key==='accessible' ? false : key==='price'?0:key==='capacity'?10:key==='duration_minutes'?120:key==='currency'?'USD':'']));
 
-export default function AdminWorkspace({ section, lang='ar' }) {
+const jsonDefaults = { gallery: [], schedule: [], accessibility_details: {}, accessible_features: {} };
+
+export default function AdminWorkspace({ section, lang='ar', type='destinations', setType=()=>{}, onGoToExperiences=()=>{} }) {
   const rtl = lang === 'ar';
-  const [type,setType] = useState('destinations');
   const [items,setItems] = useState([]);
   const [rows,setRows] = useState([]);
   const [loading,setLoading] = useState(false);
@@ -103,7 +104,7 @@ export default function AdminWorkspace({ section, lang='ar' }) {
     const next = {};
     contentTypes[type].fields.forEach(([key,, ,kind]) => {
       const value = row[key];
-      next[key] = kind === 'array' ? (Array.isArray(value) ? value.join(', ') : '') : kind === 'json' ? JSON.stringify(value ?? (key==='gallery' ? [] : {}), null, 2) : (value ?? '');
+      next[key] = kind === 'array' ? (Array.isArray(value) ? value.join(', ') : '') : kind === 'json' ? JSON.stringify(value ?? jsonDefaults[key] ?? {}, null, 2) : (value ?? '');
     });
     setEditing(row.id); setForm(next);
   };
@@ -115,8 +116,17 @@ export default function AdminWorkspace({ section, lang='ar' }) {
         let value = form[key];
         if (required && !String(value ?? '').trim()) throw new Error(t('أكمل الحقول المطلوبة أولًا.','Complete the required fields first.'));
         if (kind === 'array') value = String(value || '').split(',').map(x=>x.trim()).filter(Boolean);
-        if (kind === 'number') value = value === '' ? null : Number(value);
-        if (kind === 'json') { try { value = value ? JSON.parse(value) : (key==='gallery' ? [] : {}); } catch { throw new Error(t('صيغة JSON غير صحيحة في أحد الحقول.','One of the JSON fields is invalid.')); } }
+        if (kind === 'number') {
+          if (String(value ?? '').trim() === '') {
+            const defaults = { price: 0, duration_minutes: 120, capacity: 10 };
+            value = Object.prototype.hasOwnProperty.call(defaults, key) ? defaults[key] : null;
+          } else {
+            value = Number(value);
+            if (!Number.isFinite(value)) throw new Error(t('أدخل رقمًا صحيحًا في الحقل.','Enter a valid number in this field.'));
+          }
+        }
+        if (kind === 'select') value = value === '' || value == null ? null : value;
+        if (kind === 'json') { try { value = String(value ?? '').trim() ? JSON.parse(value) : (jsonDefaults[key] ?? {}); } catch { throw new Error(t('صيغة JSON غير صحيحة في أحد الحقول.','One of the JSON fields is invalid.')); } }
         if (kind === 'boolean') value = Boolean(value);
         payload[key] = value;
       }
@@ -136,6 +146,42 @@ export default function AdminWorkspace({ section, lang='ar' }) {
       const d = await r.json(); if(!r.ok) throw new Error(d.error || 'Delete failed.');
       await load();
     } catch(e) { setError(e.message || 'Delete failed.'); }
+  }
+
+  function startManualBooking() {
+    setError('');
+    setManualBooking({experience_id:'',customer_name:'',customer_phone:'',customer_email:'',booking_date:'',guests:1,notes:'',status:'pending'});
+    setShowManualBooking(true);
+  }
+
+  async function submitManualBooking(e) {
+    e.preventDefault();
+    if (!experienceOptions.length) {
+      setError(t('لا يمكن إنشاء حجز قبل نشر تجربة واحدة على الأقل.','Publish at least one experience before creating a booking.'));
+      return;
+    }
+    setSavingBooking(true);
+    setError('');
+    try {
+      const response = await fetch('/api/admin/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(manualBooking)
+      });
+      const data = await response.json();
+      if (response.status === 401) {
+        setError(t('انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.','Your admin session expired. Please sign in again.'));
+        return;
+      }
+      if (!response.ok) throw new Error(data.error || t('تعذر حفظ الحجز.','Could not save the booking.'));
+      setShowManualBooking(false);
+      setManualBooking({experience_id:'',customer_name:'',customer_phone:'',customer_email:'',booking_date:'',guests:1,notes:'',status:'pending'});
+      await load();
+    } catch (e) {
+      setError(e.message || t('تعذر حفظ الحجز.','Could not save the booking.'));
+    } finally {
+      setSavingBooking(false);
+    }
   }
 
   async function patchStatus(kind,row,value) {
@@ -179,7 +225,7 @@ export default function AdminWorkspace({ section, lang='ar' }) {
   }
 
   if (section === 'bookings') return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
-    <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL OPERATIONS</span><h2>{title}</h2><p>{t('راجع طلبات الحجز وأضف حجزًا يدويًا للعميل وغيّر حالته.','Review requests, create a booking manually, and update its status.')}</p></div><div className="workspace-heading-actions"><button className="workspace-primary" onClick={startManualBooking}><Plus size={16}/>{t('إضافة حجز','Add booking')}</button><button className="workspace-quiet" onClick={load}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div></div>
+    <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL OPERATIONS</span><h2>{title}</h2><p>{t('راجع طلبات الحجز وأضف حجزًا يدويًا للعميل وغيّر حالته.','Review requests, create a booking manually, and update its status.')}</p></div><div className="workspace-heading-actions">{!experienceOptions.length&&<button className="workspace-quiet" onClick={onGoToExperiences}><FileText size={15}/>{t('إضافة تجربة أولًا','Add an experience first')}</button>}<button className="workspace-primary" onClick={startManualBooking}><Plus size={16}/>{t('إضافة حجز','Add booking')}</button><button className="workspace-quiet" onClick={load}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div></div>
     {error&&<div className="workspace-error">{error}</div>}
     {showManualBooking&&<form className="workspace-form" onSubmit={submitManualBooking}>
       <div className="workspace-form-head"><strong>{t('إضافة حجز يدوي','Create manual booking')}</strong><button type="button" onClick={()=>setShowManualBooking(false)}><X size={17}/></button></div>
@@ -207,7 +253,7 @@ export default function AdminWorkspace({ section, lang='ar' }) {
         <label>{t('الحالة','Status')}<select value={manualBooking.status} onChange={e=>setManualBooking({...manualBooking,status:e.target.value})}>{bookingStatuses.map(s=><option key={s} value={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select></label>
         <label className="wide">{t('ملاحظات','Notes')}<textarea rows="2" maxLength="1000" value={manualBooking.notes} onChange={e=>setManualBooking({...manualBooking,notes:e.target.value})}/></label>
       </div>
-      {!experienceOptions.length&&<div className="workspace-error">{t('لا توجد تجارب منشورة. أضف تجربة من إدارة المحتوى ثم انشرها أولًا.','No published experiences. Add an experience under Content and publish it first.')}</div>}
+      {!experienceOptions.length&&<div className="workspace-error">{t('لا توجد تجارب منشورة؛ لن يمكن حفظ حجز حتى تضيف تجربة وتنشرها.','There are no published experiences, so bookings cannot be saved yet. Add and publish an experience first.')} <button type="button" className="workspace-quiet" onClick={onGoToExperiences}>{t('فتح إدارة التجارب','Open experience management')}</button></div>}
       <div className="workspace-form-actions"><button type="button" className="workspace-quiet" onClick={()=>setShowManualBooking(false)}>{t('إلغاء','Cancel')}</button><button className="workspace-primary" disabled={savingBooking||!experienceOptions.length}>{savingBooking?t('جارٍ الحفظ...','Saving...'):t('حفظ الحجز','Save booking')}</button></div>
     </form>}
     <div className="workspace-list">{loading?<div className="workspace-empty">{t('جارٍ التحميل...','Loading...')}</div>:filtered.map(b=><article className="workspace-row" key={b.id}><div className="workspace-item-main"><strong>{b.customer_name} · {b.booking_code||b.id?.slice(0,8)}</strong><small>{b.customer_phone} · {b.booking_date} · {b.guests} {t('أفراد','guests')}</small><small>{b.customer_email||'—'} · {money(b.total_amount,b.currency)}</small></div><select value={b.status} onChange={e=>patchStatus('bookings',b,e.target.value)}>{bookingStatuses.map(s=><option key={s} value={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select></article>)}
