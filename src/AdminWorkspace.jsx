@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Save, X, RefreshCw, MapPin, Users, CalendarDays, Star, FileText, CheckCircle2, Clock3, ShieldCheck } from 'lucide-react';
+import { Plus, Pencil, Trash2, Save, X, RefreshCw, MapPin, Users, CalendarDays, Star, Award, FileText, CheckCircle2, Clock3, ShieldCheck } from 'lucide-react';
 import './admin-workspace.css';
 
 const contentTypes = {
@@ -40,8 +40,9 @@ const contentTypes = {
 
 const bookingStatuses = ['pending','accepted','confirmed','cancelled','completed','rejected'];
 const applicationStatuses = ['pending','reviewing','approved','rejected'];
-const statusAr = {pending:'قيد الانتظار',accepted:'مقبول',confirmed:'مؤكد',cancelled:'ملغي',completed:'مكتمل',rejected:'مرفوض',reviewing:'قيد المراجعة',approved:'تمت الموافقة'};
-const statusEn = {pending:'Pending',accepted:'Accepted',confirmed:'Confirmed',cancelled:'Cancelled',completed:'Completed',rejected:'Rejected',reviewing:'Reviewing',approved:'Approved'};
+const passportStatuses = ['submitted','verified','rejected'];
+const statusAr = {pending:'قيد الانتظار',accepted:'مقبول',confirmed:'مؤكد',cancelled:'ملغي',completed:'مكتمل',rejected:'مرفوض',reviewing:'قيد المراجعة',approved:'تمت الموافقة',submitted:'قيد المراجعة',verified:'تم التحقق'};
+const statusEn = {pending:'Pending',accepted:'Accepted',confirmed:'Confirmed',cancelled:'Cancelled',completed:'Completed',rejected:'Rejected',reviewing:'Reviewing',approved:'Approved',submitted:'Submitted',verified:'Verified'};
 const money = (v,c='USD') => new Intl.NumberFormat('en',{style:'currency',currency:c,maximumFractionDigits:2}).format(Number(v||0));
 const blankFor = fields => Object.fromEntries(fields.map(([key,,,,required]) => [key, key==='published'||key==='verified'||key==='is_demo'||key==='featured'||key==='family_friendly'||key==='nature'||key==='halal_options'||key==='accessible' ? false : key==='price'?0:key==='capacity'?10:key==='duration_minutes'?120:key==='currency'?'USD':'']));
 
@@ -73,10 +74,11 @@ export default function AdminWorkspace({ section, lang='ar', type='destinations'
       if (section === 'bookings') url = '/api/admin/bookings';
       if (section === 'reviews') url = '/api/admin/reviews';
       if (section === 'applications') url = '/api/admin/guide-applications';
+      if (section === 'passport') url = '/api/admin/passport';
       const response = await fetch(url);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not load data.');
-      setItems(data.items || data.bookings || data.reviews || data.applications || []);
+      setItems(data.items || data.bookings || data.reviews || data.applications || data.visits || []);
       if (section === 'content' && type === 'experiences') {
         const [destResponse, guideResponse] = await Promise.all([
           fetch('/api/admin/content?type=destinations'),
@@ -185,8 +187,8 @@ export default function AdminWorkspace({ section, lang='ar', type='destinations'
   }
 
   async function patchStatus(kind,row,value) {
-    const endpoint = kind==='bookings' ? `/api/admin/bookings/${row.id}` : kind==='applications' ? `/api/admin/guide-applications/${row.id}` : `/api/admin/reviews/${row.id}`;
-    const body = kind==='reviews' ? {approved:value} : {status:value};
+    const endpoint = kind==='bookings' ? `/api/admin/bookings/${row.id}` : kind==='applications' ? `/api/admin/guide-applications/${row.id}` : kind==='passport' ? `/api/admin/passport/${row.id}` : `/api/admin/reviews/${row.id}`;
+    const body = kind==='reviews' ? {approved:value} : kind==='passport' ? {status:value,points:row.points} : {status:value};
     try {
       const r=await fetch(endpoint,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const d=await r.json(); if(!r.ok) throw new Error(d.error || 'Update failed.');
@@ -195,7 +197,7 @@ export default function AdminWorkspace({ section, lang='ar', type='destinations'
   }
 
   const filtered = items.filter(row => JSON.stringify(row).toLowerCase().includes(search.toLowerCase()));
-  const title = section==='content'?t('إدارة المحتوى','Content management'):section==='bookings'?t('الحجوزات','Bookings'):section==='reviews'?t('مراجعة التقييمات','Review moderation'):t('طلبات انضمام المرشدين','Guide applications');
+  const title = section==='content'?t('إدارة المحتوى','Content management'):section==='bookings'?t('الحجوزات','Bookings'):section==='reviews'?t('مراجعة التقييمات','Review moderation'):section==='passport'?t('مراجعة جواز السفر الرقمي','Passport visit moderation'):t('طلبات انضمام المرشدين','Guide applications');
 
   if (section === 'content') {
     const fields = contentTypes[type].fields;
@@ -265,6 +267,20 @@ export default function AdminWorkspace({ section, lang='ar', type='destinations'
     {error&&<div className="workspace-error">{error}</div>}
     <div className="workspace-list">{loading?<div className="workspace-empty">{t('جارٍ التحميل...','Loading...')}</div>:filtered.map(r=><article className="workspace-review" key={r.id}><div className="workspace-review-top"><strong>{r.author_name}</strong><span><Star size={14} fill="currentColor"/> {r.rating}/5</span><span className={'workspace-badge '+(r.approved?'published':'draft')}>{r.approved?t('منشور','Approved'):t('بانتظار المراجعة','Pending')}</span></div><p>{r.comment}</p><button className="workspace-primary" onClick={()=>patchStatus('reviews',r,!r.approved)}>{r.approved?t('إخفاء التقييم','Unpublish review'):t('الموافقة والنشر','Approve & publish')}</button></article>)}
     {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد تقييمات حتى الآن.','No reviews yet.')}</div>}</div>
+  </section>;
+
+  if (section === 'passport') return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
+    <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL PASSPORT</span><h2>{title}</h2><p>{t('راجع الزيارات المرسلة، واعتمد الزيارة وحدد نقاطها بعد التحقق.','Review submitted visits, verify them, and assign points after checking the details.')}</p></div><button className="workspace-quiet" onClick={load} disabled={loading}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div>
+    {error&&<div className="workspace-error">{error}</div>}
+    <div className="workspace-list">{loading?<div className="workspace-empty"><RefreshCw className="spin"/> {t('جارٍ تحميل الزيارات...','Loading visits...')}</div>:filtered.map(v=><article className="workspace-row" key={v.id}>
+      <div className="workspace-item-main"><strong>{rtl?(v.destination?.name_ar||t('وجهة غير متاحة','Unknown destination')):(v.destination?.name_en||t('Unknown destination','Unknown destination'))}</strong><small>{t('المسافر: ','Traveller: ')}{v.profile?.full_name||v.user_id}</small><small>{t('تاريخ الزيارة: ','Visit date: ')}{v.visited_on||'—'} · {t('النقاط الحالية: ','Current points: ')}{v.points??0}</small>{v.note&&<small>{v.note}</small>}</div>
+      <div className="workspace-passport-actions">
+        <label>{t('النقاط','Points')}<input type="number" min="0" max="100000" step="1" value={v.points??0} onChange={e=>setItems(previous=>previous.map(item=>item.id===v.id?{...item,points:e.target.value===''?0:Number(e.target.value)}:item))}/></label>
+        <select value={v.status} onChange={e=>patchStatus('passport',v,e.target.value)}>{passportStatuses.map(s=><option value={s} key={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select>
+        <button className="workspace-quiet" onClick={()=>patchStatus('passport',v,v.status)}><Save size={15}/>{t('حفظ النقاط','Save points')}</button>
+      </div>
+    </article>)}
+    {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد زيارات مرسلة حتى الآن.','No passport visits have been submitted yet.')}</div>}</div>
   </section>;
 
   return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
