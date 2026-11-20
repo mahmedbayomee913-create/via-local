@@ -54,8 +54,7 @@ revoke all on table private.via_local_backend_config from public, anon, authenti
 
 insert into private.via_local_backend_config (singleton, secret_hash)
 values (true, '2db2064fd8215bedb17e9bc80c6301316d24750eef24abab7f97a5c12cf29b80')
-on conflict (singleton) do update
-set secret_hash = excluded.secret_hash;
+on conflict (singleton) do nothing;
 
 drop policy if exists "VIA LOCAL backend select" on public.guide_requests;
 drop policy if exists "VIA LOCAL backend insert" on public.guide_requests;
