@@ -37,7 +37,7 @@ export default async function handler(req, res) {
         evening: linked[1] ? { type: 'experience', ...linked[1] } : { type: 'free-time', title: 'Local food and relaxed exploration' }
       };
     });
-    const user = await getCustomer(req);
+    const user = await getCustomer(req, res);
     const record = await db('itineraries', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
       user_id: user?.id || null, title: `${city} trip plan`, city, country: country || null, days, currency, interests, plan
     }) });
