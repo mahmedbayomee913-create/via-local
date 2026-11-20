@@ -96,11 +96,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const [destinations, guides, experiences, reviews] = await Promise.all([
+    const [destinations, guides, experiences, reviews, pages] = await Promise.all([
       db('destinations?select=*&published=eq.true&order=featured.desc,name_en.asc&limit=200'),
       db('guides?select=*&published=eq.true&order=verified.desc,name_en.asc&limit=200'),
       db('experiences?select=*&published=eq.true&order=created_at.desc&limit=200'),
-      db('reviews?select=id,destination_id,guide_id,author_name,rating,comment,created_at&approved=eq.true&order=created_at.desc&limit=500')
+      db('reviews?select=id,destination_id,guide_id,author_name,rating,comment,created_at&approved=eq.true&order=created_at.desc&limit=500'),
+      db('content_pages?select=id,slug,title_ar,title_en,body_ar,body_en,updated_at&published=eq.true&order=updated_at.desc&limit=100')
     ]);
 
     let photoMap = new Map();
@@ -132,6 +133,7 @@ export default async function handler(req, res) {
       guides,
       experiences,
       reviews,
+      pages: pages || [],
       ratings: { destinations: destinationRatings, guides: guideRatings }
     });
   } catch (error) {
