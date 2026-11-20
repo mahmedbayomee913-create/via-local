@@ -147,7 +147,7 @@ function App() {
           <section className="container section">
             <div className="section-heading"><div><span className="eyebrow gold-text">{t.categories}</span><h2>{t.explore}</h2></div><button className="text-link" onClick={() => navigate('explore')}>{t.discover}<ChevronLeft size={17}/></button></div>
             <div className="feature-grid">
-              <button className="feature-card feature-burgundy" onClick={() => setTab('explore')}><span className="feature-icon"><Compass/></span><strong>{t.explore}</strong><small>{t.exploreSub}</small><ArrowUpLeft className="feature-arrow"/></button>
+              <button className="feature-card feature-burgundy" onClick={() => navigate('explore')><span className="feature-icon"><Compass/></span><strong>{t.explore}</strong><small>{t.exploreSub}</small><ArrowUpLeft className="feature-arrow"/></button>
               <button className="feature-card feature-gold" onClick={() => navigate('guides')}><span className="feature-icon"><Users/></span><strong>{t.guides}</strong><small>{t.guidesFeatureSub}</small><ArrowUpLeft className="feature-arrow"/></button>
               <button className="feature-card feature-light" onClick={() => navigate('access')}><span className="feature-icon"><Accessibility/></span><strong>{t.access}</strong><small>{t.accessSub}</small><ArrowUpLeft className="feature-arrow"/></button>
             </div>
@@ -167,7 +167,7 @@ function App() {
             </div>
           </div>
           <div className="results-caption"><span><SlidersHorizontal size={16}/>{t.searchResults}</span><small>{filteredPlaces.length} {rtl ? 'أماكن' : 'places'}</small></div>
-          {filteredPlaces.length ? <PlaceGrid items={filteredPlaces} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} onSelect={setSelectedPlace}/> : <div className="empty-state"><Search size={30}/><p>{t.noResults}</p><button className="btn-outline" onClick={() => {setQuery('');setFilter('all')}}>{t.clearFilters}</button></div>}
+          {filteredPlaces.length ? <PlaceGrid items={filteredPlaces} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} onSelect={setSelectedPlace}/> : <div className="empty-state"><Search size={30}/><p>{t.noResults}</p><button className="btn-outline" onClick={() => {setQuery('');setFilter('all');notify(rtl ? 'تم مسح البحث والفلاتر.' : 'Search and filters cleared.')}}>{t.clearFilters}</button></div>}
         </section>}
 
         {tab === 'guides' && <section className="container page-section">
