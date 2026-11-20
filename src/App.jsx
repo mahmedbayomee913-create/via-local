@@ -15,7 +15,15 @@ const places = [
   { id: 5, name: 'وادي دربات', city: 'صلالة', category: 'طبيعة', tags: ['طبيعة', 'عائلات'], rating: '—', distance: 'ظفار', family: true, nature: true, accessible: false, image: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=1000&q=85', description: 'مناظر طبيعية خضراء وشلالات موسمية في محافظة ظفار، وتختلف الأجواء والمشهد حسب الموسم.' },
   { id: 6, name: 'قلعة خصب', city: 'خصب', category: 'تراثي', tags: ['تاريخ', 'ثقافة'], rating: '—', distance: 'مسندم', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1512632578888-169bbbc64f33?auto=format&fit=crop&w=1000&q=85', description: 'قلعة عُمانية تاريخية تطل على مشهد ساحلي في محافظة مسندم، وتقدم لمحة عن تاريخ المنطقة.' },
   { id: 7, name: 'رمال الشرقية', city: 'بدية', category: 'طبيعة', tags: ['صحراء', 'تجارب محلية'], rating: '—', distance: 'شمال الشرقية', family: true, nature: true, accessible: false, image: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=1000&q=85', description: 'كثبان رملية واسعة وتجربة صحراوية مميزة. اختر مزود خدمة مرخصًا واتبع إرشادات السلامة المحلية.' },
-  { id: 8, name: 'شاطئ المغسيل', city: 'صلالة', category: 'طبيعة', tags: ['شاطئ', 'طبيعة'], rating: '—', distance: 'ظفار', family: true, nature: true, accessible: false, image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=85', description: 'شاطئ معروف غرب صلالة بتكويناته الساحلية ونوافيره الطبيعية التي تظهر مع حركة البحر.' }
+  { id: 8, name: 'شاطئ المغسيل', city: 'صلالة', category: 'طبيعة', tags: ['شاطئ', 'طبيعة'], rating: '—', distance: 'ظفار', family: true, nature: true, accessible: false, image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=85', description: 'شاطئ معروف غرب صلالة بتكويناته الساحلية ونوافيره الطبيعية التي تظهر مع حركة البحر.' },
+  { id: 9, name: 'غوبكلي تبه (Göbekli Tepe)', city: 'تركيا', category: 'أثري', tags: ['آثار', 'تاريخ قديم'], rating: '—', distance: 'شانلي أورفا', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1603565816030-6b389eeb23cb?auto=format&fit=crop&w=1000&q=85', description: 'مجمع أثري يعود إلى نحو 12,000 عام ويضم أعمدة حجرية ضخمة منحوتة، ويُعد من أقدم المواقع المعروفة ذات الطابع الطقسي.' },
+  { id: 10, name: 'مدينة ديرينكويو تحت الأرض', city: 'تركيا', category: 'أثري', tags: ['مدينة تحت الأرض', 'تاريخ'], rating: '—', distance: 'كابادوكيا', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1000&q=85', description: 'مدينة محفورة تحت الأرض في عدة مستويات، تضم ممرات وغرفًا ومرافق كانت تُستخدم للحماية والإقامة عبر فترات تاريخية.' },
+  { id: 11, name: 'هايبوجيوم هال سافليني', city: 'مالطا', category: 'أثري', tags: ['معبد', 'تحت الأرض'], rating: '—', distance: 'باولا', family: false, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=1000&q=85', description: 'موقع ومعبد تحت الأرض يعود إلى عصور ما قبل التاريخ، يتميز بممرات وغرف منحوتة في الصخر وخصائص صوتية لافتة. الزيارة تحتاج حجزًا مسبقًا.' },
+  { id: 12, name: 'سكارا بري (Skara Brae)', city: 'اسكتلندا', category: 'أثري', tags: ['العصر الحجري', 'قرية قديمة'], rating: '—', distance: 'أوركني', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1000&q=85', description: 'قرية من العصر الحجري الحديث بقيت فيها مساكن وأثاث حجري محفوظ بصورة استثنائية، وتمنح تصورًا عن الحياة اليومية قبل آلاف السنين.' },
+  { id: 13, name: 'جميلة (Djémila)', city: 'الجزائر', category: 'أثري', tags: ['روماني', 'مدينة أثرية'], rating: '—', distance: 'سطيف', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1533158326339-7f3cf2404354?auto=format&fit=crop&w=1000&q=85', description: 'مدينة رومانية أثرية محفوظة في منطقة جبلية، تضم معابد وساحات وأقواسًا وآثارًا معمارية تعكس تخطيط المدن الرومانية.' },
+  { id: 14, name: 'زيمبابوي العظمى (Great Zimbabwe)', city: 'زيمبابوي', category: 'أثري', tags: ['حضارة أفريقية', 'آثار حجرية'], rating: '—', distance: 'ماسينغو', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1000&q=85', description: 'أطلال مدينة حجرية كانت مركزًا لمملكة أفريقية مزدهرة، وتشتهر بجدرانها الحجرية الكبيرة المشيدة دون ملاط.' },
+  { id: 15, name: 'تيواناكو (Tiwanaku)', city: 'بوليفيا', category: 'أثري', tags: ['ما قبل الإنكا', 'معابد'], rating: '—', distance: 'قرب بحيرة تيتيكاكا', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1000&q=85', description: 'موقع حضاري قديم على هضبة مرتفعة قرب بحيرة تيتيكاكا، يضم مباني ومعابد وأعمالًا حجرية دقيقة تعود إلى حضارة ما قبل الإنكا.' },
+  { id: 16, name: 'سوخوثاي (Sukhothai)', city: 'تايلاند', category: 'أثري', tags: ['تاريخ', 'معابد بوذية'], rating: '—', distance: 'شمال وسط تايلاند', family: true, nature: false, accessible: false, image: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=1000&q=85', description: 'حديقة تاريخية تضم بقايا معابد وتماثيل بوذية وآثار مملكة سوخوثاي، وتشتهر بمساحاتها الواسعة وبركها وممراتها.' },
 ];
 
 const guides = [
@@ -27,10 +35,10 @@ const guides = [
 const copy = {
   ar: {
     explore: 'لا تزُر المكان... انتمِ إليه', guides: 'عِش عُمان بعيون أهلها', access: 'السفر للجميع... بلا حواجز',
-    home: 'الرئيسية', discover: 'اكتشف عُمان', localGuides: 'المرشدون المحليون', inclusive: 'الوصول الشامل',
-    tagline: 'عُمان أقرب مما تتخيّل', sub: 'من أزقة مسقط وأسواقها إلى جبال الحجر وخضرة ظفار؛ اكتشف عُمان مع أهلها وبالطريقة التي تناسبك.',
-    search: 'ابحث عن مدينة أو وجهة في عُمان...', start: 'ابدأ الاستكشاف', exploreTitle: 'وجهات عُمانية تستحق التجربة',
-    exploreSub: 'اكتشف مزيج عُمان من التراث والطبيعة والسواحل والصحراء.', all: 'كل الوجهات', family: 'مناسب للعائلات',
+    home: 'الرئيسية', discover: 'اكتشف العالم', localGuides: 'المرشدون المحليون', inclusive: 'الوصول الشامل',
+    tagline: 'العالم أقرب مما تتخيّل', sub: 'اكتشف وجهات استثنائية حول العالم؛ من المدن القديمة والمواقع الأثرية إلى الطبيعة والثقافات المختلفة، في تجربة سفر واحدة.',
+    search: 'ابحث عن دولة أو مدينة أو وجهة...', start: 'ابدأ الاستكشاف', exploreTitle: 'وجهات حول العالم تستحق التجربة',
+    exploreSub: 'اختار وجهتك واكتشف حكايات المواقع التاريخية والثقافات والطبيعة.', all: 'كل الوجهات', family: 'مناسب للعائلات',
     halal: 'خيارات الطعام الحلال', nature: 'طبيعة ومغامرات', accessible: 'معلومات الوصول', guidesTitle: 'اكتشف عُمان مع أهلها',
     guidesSub: 'تعرّف على نماذج تجريبية لخدمات الإرشاد المحلي. لا تمثل هذه الملفات أشخاصًا حقيقيين أو حجوزات متاحة.',
     viewProfile: 'عرض الملف', book: 'طلب تواصل تجريبي', accessTitle: 'تجربة سفر أكثر شمولًا',
@@ -39,18 +47,18 @@ const copy = {
     communication: 'مساعد تحويل النص إلى صوت', communicationSub: 'اكتب العبارة وسيحاول المتصفح قراءتها بصوت مسموع.',
     typeHere: 'اكتب ما تريد قوله...', speak: 'استمع إلى العبارة', stop: 'إيقاف الصوت',
     location: 'استخدم موقعي', locationHelp: 'يمكنك السماح بالموقع من جهازك؛ لا نستخدمه حاليًا لجلب أماكن حقيقية.',
-    featured: 'ابدأ من هنا', categories: 'تجارب عُمانية', history: 'تاريخ وثقافة', familyCat: 'عائلات وأطفال',
+    featured: 'ابدأ من هنا', categories: 'تجارب حول العالم', history: 'تاريخ وثقافة', familyCat: 'عائلات وأطفال',
     food: 'مطاعم ومقاهٍ', accessibleCat: 'وصول ميسّر', rating: 'التقييم', distance: 'المنطقة',
     details: 'التفاصيل', demo: 'نسخة تجريبية', footer: 'رحلتك تبدأ بفهم المكان.', requestSent: 'تم تسجيل طلبك التجريبي فقط — لا يوجد حجز فعلي.',
     close: 'إغلاق', searchResults: 'نتائج الاستكشاف', noResults: 'لا توجد نتائج مطابقة. جرّب تغيير البحث أو الفلاتر.',
-    filter: 'تصفية', language: 'English', verifiedNote: 'محتوى تعريفي أولي مستند إلى وجهات عُمانية معروفة؛ راجع الجهات الرسمية قبل الزيارة. التقييمات والتوافر غير متصلين.'
+    filter: 'تصفية', language: 'English', verifiedNote: 'المعلومات تعريفية أولية؛ تحقق من تفاصيل الزيارة والحجز من الجهات الرسمية. الصور قد تكون توضيحية، والتقييمات والتوافر غير متصلين.'
   },
   en: {
     explore: 'Don’t just visit. Belong.', guides: 'See Oman through local eyes', access: 'Travel without barriers',
-    home: 'Home', discover: 'Explore Oman', localGuides: 'Local guides', inclusive: 'Accessibility',
-    tagline: 'Oman is closer than you imagine', sub: 'From Muscat’s old souqs to the Hajar Mountains and green Dhofar, discover Oman at your own pace.',
-    search: 'Search an Omani city or destination...', start: 'Start exploring', exploreTitle: 'Omani destinations worth experiencing',
-    exploreSub: 'Discover Oman through its heritage, nature, coastline and desert.', all: 'All destinations', family: 'Family-friendly',
+    home: 'Home', discover: 'Explore the world', localGuides: 'Local guides', inclusive: 'Accessibility',
+    tagline: 'The world is closer than you imagine', sub: 'Discover extraordinary destinations—from ancient cities and archaeological sites to landscapes and cultures—in one travel experience.',
+    search: 'Search a country, city, or destination...', start: 'Start exploring', exploreTitle: 'Destinations around the world worth experiencing',
+    exploreSub: 'Explore historic places, cultures, landscapes, and remarkable destinations.', all: 'All destinations', family: 'Family-friendly',
     halal: 'Halal food options', nature: 'Nature & outdoors', accessible: 'Accessibility info', guidesTitle: 'Discover Oman with locals',
     guidesSub: 'These are sample guide profiles for demonstration only, not real people or available bookings.',
     viewProfile: 'View profile', book: 'Send demo request', accessTitle: 'A more inclusive travel experience',
@@ -59,11 +67,11 @@ const copy = {
     communication: 'Text-to-speech assistant', communicationSub: 'Type a phrase and your browser will try to read it aloud.',
     typeHere: 'Type what you want to say...', speak: 'Speak phrase', stop: 'Stop',
     location: 'Use my location', locationHelp: 'You can grant location permission; it is not yet used to fetch real places.',
-    featured: 'Start here', categories: 'Omani experiences', history: 'History & culture', familyCat: 'Families & kids',
+    featured: 'Start here', categories: 'Experiences around the world', history: 'History & culture', familyCat: 'Families & kids',
     food: 'Restaurants & cafes', accessibleCat: 'Accessible travel', rating: 'Rating', distance: 'Region',
     details: 'Details', demo: 'Prototype', footer: 'Your journey starts with understanding the place.', requestSent: 'Demo request noted only — no real booking was made.',
     close: 'Close', searchResults: 'Discovery results', noResults: 'No matching destinations. Try changing your search or filters.',
-    filter: 'Filters', language: 'العربية', verifiedNote: 'Introductory destination content based on known Omani places; verify with official sources before visiting. Ratings and availability are not live.'
+    filter: 'Filters', language: 'العربية', verifiedNote: 'Introductory information; verify visitor details with official sources. Images may be illustrative; ratings and availability are not live.'
   }
 };
 
