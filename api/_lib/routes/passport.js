@@ -1,5 +1,6 @@
 import { db } from '../db.js';
 import { getCustomer } from '../customer.js';
+import { isValidISODate } from '../validation.js';
 export default async function handler(req, res) {
   const user = await getCustomer(req, res);
   if (!user) return res.status(401).json({ error: 'Sign in to use your VIA LOCAL Passport.' });
@@ -16,7 +17,8 @@ export default async function handler(req, res) {
       const body = req.body || {};
       const destination_id = String(body.destination_id || '');
       const visited_on = String(body.visited_on || new Date().toISOString().slice(0,10));
-      if (!/^[0-9a-f-]{36}$/i.test(destination_id) || !/^\d{4}-\d{2}-\d{2}$/.test(visited_on)) return res.status(400).json({ error: 'Choose a destination and visit date.' });
+      if (!/^[0-9a-f-]{36}$/i.test(destination_id) || !isValidISODate(visited_on)) return res.status(400).json({ error: 'Choose a destination and a valid visit date.' });
+      if (visited_on > new Date().toISOString().slice(0, 10)) return res.status(400).json({ error: 'A visit date cannot be in the future.' });
       const inserted = await db('passport_visits', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ user_id: user.id, destination_id, visited_on, note: String(body.note || '').trim().slice(0,500), status: 'submitted', points: 0 }) });
       return res.status(201).json({ visit: inserted?.[0] });
     }
