@@ -24,6 +24,7 @@ export default function TravelHub({ lang='ar' }) {
   const [booking,setBooking] = useState({experience_id:'',customer_name:'',customer_email:'',customer_phone:'',booking_date:'',guests:1,notes:''});
   const [account,setAccount] = useState({email:'',password:'',full_name:'',phone:''});
   const [accountMode,setAccountMode] = useState('login');
+  const [pendingConfirmationEmail,setPendingConfirmationEmail] = useState('');
   const [user,setUser] = useState(null);
   const [profile,setProfile] = useState({full_name:'',phone:''});
   const [bookings,setBookings] = useState([]);
@@ -74,13 +75,40 @@ export default function TravelHub({ lang='ar' }) {
 
   async function submitAccount(e){
     e.preventDefault();setBusy(true);
+    const email = account.email.trim().toLowerCase();
     try{
-      const r=await fetch('/api/customer/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:accountMode,email:account.email,password:account.password,full_name:account.full_name})});
-      const d=await r.json();if(!r.ok)throw new Error(d.error||'Account request failed.');
-      if(d.confirmationRequired){message(d.message||t('راجع بريدك لتأكيد الحساب.','Check your email to confirm your account.'));return;}
+      const r=await fetch('/api/customer/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:accountMode,email,password:account.password,full_name:account.full_name})});
+      const d=await r.json();
+      if(!r.ok) {
+        if (/email not confirmed/i.test(d.error || '')) setPendingConfirmationEmail(email);
+        throw new Error(d.error||'Account request failed.');
+      }
+      if(d.confirmationRequired){
+        setPendingConfirmationEmail(email);
+        message(t('تم إنشاء الحساب. افتح رسالة التأكيد المرسلة إلى بريدك، ثم ارجع وسجّل الدخول. راجع مجلد البريد غير المرغوب فيه أيضًا.','Your account was created. Open the confirmation email, then return here to sign in. Check your spam folder too.'));
+        return;
+      }
+      setPendingConfirmationEmail('');
       await loadCustomer();message(t('تم تسجيل الدخول بنجاح.','You are signed in.'));
-    }catch(e){message(e.message||t('تعذر تسجيل الدخول','Could not sign in'));}
+    }catch(e){
+      if (/email not confirmed/i.test(e.message || '')) {
+        message(t('حسابك موجود، لكنه يحتاج تأكيد البريد الإلكتروني قبل تسجيل الدخول. أعد إرسال رسالة التأكيد من الزر أدناه.','Your account exists, but email confirmation is required before sign-in. Resend the confirmation email below.'));
+      } else message(e.message||t('تعذر تسجيل الدخول','Could not sign in'));
+    }
     finally{setBusy(false);}
+  }
+  async function resendConfirmation(){
+    const email = (pendingConfirmationEmail || account.email).trim().toLowerCase();
+    if (!email) return message(t('اكتب بريدك الإلكتروني أولًا.','Enter your email address first.'));
+    setBusy(true);
+    try {
+      const r = await fetch('/api/customer/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'resend',email})});
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || 'Could not resend confirmation email.');
+      message(t('طلبنا إرسال رسالة تأكيد جديدة. افحص صندوق الوارد والبريد غير المرغوب فيه.','A new confirmation email was requested. Check your inbox and spam folder.'));
+    } catch(e) {
+      message(e.message || t('تعذر إعادة إرسال الرسالة الآن. حاول لاحقًا.','Could not resend the email right now. Try again later.'));
+    } finally { setBusy(false); }
   }
   async function signOut(){await fetch('/api/customer/auth',{method:'DELETE'});setUser(null);setBookings([]);setVisits([]);message(t('تم تسجيل الخروج.','Signed out.'));}
   async function saveProfile(e){
@@ -149,7 +177,7 @@ export default function TravelHub({ lang='ar' }) {
         <form className="hub-form" onSubmit={saveProfile}>{field(t('الاسم','Name'),<input value={profile.full_name} onChange={e=>setProfile({...profile,full_name:e.target.value})}/>)}{field(t('الهاتف','Phone'),<input value={profile.phone} onChange={e=>setProfile({...profile,phone:e.target.value})}/>)}<button className="btn-primary" disabled={busy}>{t('حفظ البيانات','Save profile')}</button></form>
         <h3 className="hub-subtitle">{t('حجوزاتي','My bookings')}</h3>{bookings.length?bookings.map(b=><article className="hub-list-row" key={b.id}><strong>{b.booking_code}</strong><span>{b.booking_date} · {b.guests} {t('أفراد','guests')}</span><b>{b.status}</b></article>):<p className="hub-muted">{t('لا توجد حجوزات مرتبطة بهذا الحساب بعد.','No bookings linked to this account yet.')}</p>}
       </>:<><div className="hub-switch"><button className={accountMode==='login'?'active':''} onClick={()=>setAccountMode('login')}>{t('تسجيل الدخول','Sign in')}</button><button className={accountMode==='signup'?'active':''} onClick={()=>setAccountMode('signup')}>{t('إنشاء حساب','Create account')}</button></div>
-        <form className="hub-form" onSubmit={submitAccount}>{accountMode==='signup'&&field(t('الاسم','Name'),<input required value={account.full_name} onChange={e=>setAccount({...account,full_name:e.target.value})}/>)}{field(t('البريد الإلكتروني','Email'),<input required type="email" value={account.email} onChange={e=>setAccount({...account,email:e.target.value})}/>)}{field(t('كلمة المرور (8 أحرف على الأقل)','Password (8+ characters)'),<input required minLength="8" type="password" value={account.password} onChange={e=>setAccount({...account,password:e.target.value})}/>)}<button className="btn-primary" disabled={busy}>{busy?t('جارٍ التنفيذ...','Please wait...'):accountMode==='signup'?t('إنشاء الحساب','Create account'):t('دخول','Sign in')} <LogIn size={16}/></button></form><p className="hub-disclaimer">{t('قد يتطلب إنشاء الحساب تأكيد البريد الإلكتروني حسب إعدادات المصادقة في المشروع.','Email confirmation may be required depending on the project authentication settings.')}</p></>}
+        <form className="hub-form" onSubmit={submitAccount}>{accountMode==='signup'&&field(t('الاسم','Name'),<input required value={account.full_name} onChange={e=>setAccount({...account,full_name:e.target.value})}/>)}{field(t('البريد الإلكتروني','Email'),<input required type="email" value={account.email} onChange={e=>setAccount({...account,email:e.target.value})}/>)}{field(t('كلمة المرور (8 أحرف على الأقل)','Password (8+ characters)'),<input required minLength="8" type="password" value={account.password} onChange={e=>setAccount({...account,password:e.target.value})}/>)}<button className="btn-primary" disabled={busy}>{busy?t('جارٍ التنفيذ...','Please wait...'):accountMode==='signup'?t('إنشاء الحساب','Create account'):t('دخول','Sign in')} <LogIn size={16}/></button></form>{pendingConfirmationEmail&&<div className="hub-confirmation"><p>{t('بانتظار تأكيد البريد: ','Waiting for email confirmation: ')}<strong>{pendingConfirmationEmail}</strong></p><button type="button" className="btn-outline" onClick={resendConfirmation} disabled={busy}>{busy?t('جارٍ الإرسال...','Sending...'):t('إعادة إرسال رسالة التأكيد','Resend confirmation email')}</button></div>}<p className="hub-disclaimer">{t('بعد إنشاء الحساب، افتح رسالة التأكيد المرسلة إلى بريدك الإلكتروني قبل تسجيل الدخول.','After creating an account, confirm your email before signing in.')}</p></>}
     </div>}
 
     {tab==='passport'&&<div className="hub-card"><div className="hub-card-title"><Award size={20}/><div><h2>{t('VIA LOCAL Passport','VIA LOCAL Passport')}</h2><p>{t('سجّل الأماكن التي زرتها واجمع نقاطًا بعد التحقق من الزيارات.','Record places you have visited and collect points after visits are verified.')}</p></div></div>
