@@ -18,6 +18,7 @@ import adminReviews from './routes/admin-reviews.js';
 import adminReviewsId from './routes/admin-reviews-id.js.js';
 import adminGuideApplications from './routes/admin-guide-applications.js';
 import adminGuideApplicationsId from './routes/admin-guide-applications-id.js.js';
+import adminPassport from './routes/admin-passport.js';
 
 import customerAuth from './routes/customer-auth.js';
 import customerMe from './routes/customer-me.js';
@@ -55,6 +56,7 @@ export default async function handler(req, res) {
     if (sub === 'bookings') return id ? adminBookingsId(req, res) : adminBookings(req, res);
     if (sub === 'reviews') return id ? adminReviewsId(req, res) : adminReviews(req, res);
     if (sub === 'guide-applications') return id ? adminGuideApplicationsId(req, res) : adminGuideApplications(req, res);
+    if (sub === 'passport') return id ? adminPassport(req, res) : adminPassport(req, res);
   }
 
   return res.status(404).json({ error: 'API route not found.' });
