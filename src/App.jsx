@@ -31,8 +31,8 @@ const places = [
 const guides = [];
 
 const copy = {
-ar:{explore:'لا تزُر المكان... انتمِ إليه',guides:'عِش المكان بعيون أهله',access:'السفر للجميع... بلا حواجز',home:'الرئيسية',discover:'اكتشف العالم',localGuides:'المرشدون المحليون',inclusive:'الوصول الشامل',tagline:'العالم أقرب مما تتخيّل',heroLine1:'سفر آمن وشامل...',heroLine2:'انتمِ إلى المكان',sub:'فيا لوكال يجمع استكشاف الوجهات، والتعرّف على المرشدين المحليين، ومعلومات الوصول الشامل — في تجربة واحدة.',heroLabel:'منصة سياحية ذكية · تجربة سفر للجميع',announcement:'منصة فيا لوكال — استكشف العالم بأمان، واكتشف المكان مع أهله',search:'ابحث عن دولة أو مدينة أو وجهة...',start:'ابدأ الاستكشاف',exploreTitle:'وجهات حول العالم تستحق التجربة',exploreSub:'اكتشف حكايات المواقع التاريخية والثقافات والطبيعة.',all:'كل الوجهات',family:'مناسب للعائلات',halal:'خيارات الطعام الحلال',nature:'طبيعة ومغامرات',accessible:'إمكانية الوصول',guidesTitle:'تعرّف على المرشدين المحليين',guidesSub:'تعرّف على المرشدين المحليين المعتمدين، أو قدّم طلبًا للانضمام إلى شبكة VIA LOCAL.',guidesFeatureSub:'تواصل مع مرشدين محليين بعد مراجعة ملفاتهم.',noRating:'لا يوجد تقييم',accessSub:'معلومات وصول متاحة وأدوات تواصل مساعدة.',viewProfile:'عرض الملف',book:'طلب جولة',accessTitle:'تجربة سفر أكثر شمولًا',mapTitle:'خريطة الوصول',mapSub:'اختر وجهة لعرض موقعها على الخريطة، ثم راجع معلومات الوصول المتاحة.',communication:'تحويل النص إلى صوت',communicationSub:'اكتب عبارة وسيحاول المتصفح قراءتها بصوت مسموع.',typeHere:'اكتب ما تريد قوله...',speak:'استمع إلى العبارة',stop:'إيقاف الصوت',location:'استخدم موقعي',locationHelp:'الموقع اختياري ويُستخدم فقط لتحديد نطاق الاستكشاف عند تفعيل هذه الميزة.',featured:'وجهات مختارة',categories:'اكتشف تجارب جديدة',history:'تاريخ وثقافة',familyCat:'عائلات وأطفال',food:'مطاعم ومقاهٍ',accessibleCat:'وصول ميسّر',rating:'التقييم',distance:'المنطقة',details:'التفاصيل',footer:'رحلتك تبدأ بفهم المكان.',requestSent:'سيتم إرسال طلب اهتمام بالجولة، وليس حجزًا مؤكدًا.',close:'إغلاق',searchResults:'نتائج الاستكشاف',noResults:'لا توجد نتائج مطابقة. جرّب تغيير البحث أو الفلاتر.',filter:'تصفية',favoritesFilter:'المفضلة',clearFilters:'مسح البحث والفلاتر',language:'English',verifiedNote:'تحقق من تفاصيل الزيارة من المصادر الرسمية قبل السفر. التقييمات والتوافر ليست مباشرة.',saved:'تمت إضافة المكان إلى المفضلة.',unsaved:'تمت إزالة المكان من المفضلة.',save:'أضف للمفضلة',savedLabel:'في المفضلة',homeAria:'العودة للرئيسية',menuAria:'فتح القائمة',saveAria:'حفظ المكان في المفضلة'},
-en:{explore:'Don’t just visit. Belong.',guides:'Experience places through local eyes',access:'Travel without barriers',home:'Home',discover:'Explore the world',localGuides:'Local guides',inclusive:'Accessibility',tagline:'The world is closer than you imagine',heroLine1:'Travel safely and inclusively...',heroLine2:'Belong to the place',sub:'VIA LOCAL brings destination discovery, local guide introductions, and accessibility information together in one experience.',heroLabel:'Smart travel platform · Travel for everyone',announcement:'VIA LOCAL — Explore the world safely and discover places with local people',search:'Search a country, city, or destination...',start:'Start exploring',exploreTitle:'Destinations around the world worth experiencing',exploreSub:'Discover stories, historic sites, cultures, and nature.',all:'All destinations',family:'Family-friendly',halal:'Halal food options',nature:'Nature & outdoors',accessible:'Accessibility',guidesTitle:'Meet local guides',guidesSub:'Meet published local guides, or apply to join the VIA LOCAL guide network.',guidesFeatureSub:'Connect with reviewed local guides.',noRating:'No rating',accessSub:'Available accessibility information and helpful communication tools.',viewProfile:'View profile',book:'Request a tour',accessTitle:'A more inclusive travel experience',mapTitle:'Accessibility map',mapSub:'Choose a destination to view its map and review available accessibility details.',communication:'Text-to-speech',communicationSub:'Type a phrase and your browser may read it aloud.',typeHere:'Type what you want to say...',speak:'Speak phrase',stop:'Stop speech',location:'Use my location',locationHelp:'Location is optional and is used only to set the discovery area when this feature is enabled.',featured:'Featured destinations',categories:'Discover new experiences',history:'History & culture',familyCat:'Families & kids',food:'Restaurants & cafes',accessibleCat:'Accessible travel',rating:'Rating',distance:'Area',details:'Details',footer:'Your journey starts with understanding the place.',requestSent:'This submits a tour inquiry, not a confirmed booking.',close:'Close',searchResults:'Discovery results',noResults:'No matches. Try changing your search or filters.',filter:'Filters',favoritesFilter:'Favorites',clearFilters:'Clear search and filters',language:'العربية',verifiedNote:'Check official visitor information before your trip. Ratings and availability are not live.',saved:'Added to favorites.',unsaved:'Removed from favorites.',save:'Save to favorites',savedLabel:'Saved',homeAria:'Go to home',menuAria:'Open menu',saveAria:'Save place to favorites'}
+ar:{explore:'لا تزُر المكان... انتمِ إليه',guides:'عِش المكان بعيون أهله',access:'السفر للجميع... بلا حواجز',home:'الرئيسية',discover:'اكتشف العالم',localGuides:'المرشدون المحليون',inclusive:'الوصول الشامل',tagline:'العالم أقرب مما تتخيّل',heroLine1:'سفر آمن وشامل...',heroLine2:'انتمِ إلى المكان',sub:'فيا لوكال يجمع استكشاف الوجهات، والتعرّف على المرشدين المحليين، ومعلومات الوصول الشامل — في تجربة واحدة.',heroLabel:'منصة سياحية ذكية · تجربة سفر للجميع',announcement:'منصة فيا لوكال — استكشف العالم بأمان، واكتشف المكان مع أهله',search:'ابحث عن دولة أو مدينة أو وجهة...',start:'ابدأ الاستكشاف',exploreTitle:'وجهات حول العالم تستحق التجربة',exploreSub:'اكتشف حكايات المواقع التاريخية والثقافات والطبيعة.',all:'كل الوجهات',family:'مناسب للعائلات',halal:'خيارات الطعام الحلال',nature:'طبيعة ومغامرات',accessible:'إمكانية الوصول',guidesTitle:'تعرّف على المرشدين المحليين',guidesSub:'تعرّف على المرشدين المحليين المعتمدين، أو قدّم طلبًا للانضمام إلى شبكة VIA LOCAL.',guidesFeatureSub:'تواصل مع مرشدين محليين بعد مراجعة ملفاتهم.',noRating:'لا يوجد تقييم',accessSub:'معلومات وصول متاحة وأدوات تواصل مساعدة.',viewProfile:'عرض الملف',book:'طلب جولة',accessTitle:'تجربة سفر أكثر شمولًا',mapTitle:'خريطة الوصول',mapSub:'اختر وجهة لعرض موقعها على الخريطة، ثم راجع معلومات الوصول المتاحة.',communication:'تحويل النص إلى صوت',communicationSub:'اكتب عبارة وسيحاول المتصفح قراءتها بصوت مسموع.',typeHere:'اكتب ما تريد قوله...',speak:'استمع إلى العبارة',stop:'إيقاف الصوت',location:'رتّب حسب موقعي',locationHelp:'اختياري: استخدم موقعك لترتيب الوجهات من الأقرب إليك. لا نحفظ إحداثيات موقعك.',locationLoading:'جارٍ تحديد موقعك…',locationEnabled:'ترتيب الأقرب مفعّل',clearLocation:'إيقاف الموقع',featured:'وجهات مختارة',categories:'اكتشف تجارب جديدة',history:'تاريخ وثقافة',familyCat:'عائلات وأطفال',food:'مطاعم ومقاهٍ',accessibleCat:'وصول ميسّر',rating:'التقييم',distance:'المنطقة',details:'التفاصيل',footer:'رحلتك تبدأ بفهم المكان.',requestSent:'سيتم إرسال طلب اهتمام بالجولة، وليس حجزًا مؤكدًا.',close:'إغلاق',searchResults:'نتائج الاستكشاف',noResults:'لا توجد نتائج مطابقة. جرّب تغيير البحث أو الفلاتر.',filter:'تصفية',favoritesFilter:'المفضلة',clearFilters:'مسح البحث والفلاتر',language:'English',verifiedNote:'تحقق من تفاصيل الزيارة من المصادر الرسمية قبل السفر. التقييمات والتوافر ليست مباشرة.',saved:'تمت إضافة المكان إلى المفضلة.',unsaved:'تمت إزالة المكان من المفضلة.',save:'أضف للمفضلة',savedLabel:'في المفضلة',homeAria:'العودة للرئيسية',menuAria:'فتح القائمة',saveAria:'حفظ المكان في المفضلة'},
+en:{explore:'Don’t just visit. Belong.',guides:'Experience places through local eyes',access:'Travel without barriers',home:'Home',discover:'Explore the world',localGuides:'Local guides',inclusive:'Accessibility',tagline:'The world is closer than you imagine',heroLine1:'Travel safely and inclusively...',heroLine2:'Belong to the place',sub:'VIA LOCAL brings destination discovery, local guide introductions, and accessibility information together in one experience.',heroLabel:'Smart travel platform · Travel for everyone',announcement:'VIA LOCAL — Explore the world safely and discover places with local people',search:'Search a country, city, or destination...',start:'Start exploring',exploreTitle:'Destinations around the world worth experiencing',exploreSub:'Discover stories, historic sites, cultures, and nature.',all:'All destinations',family:'Family-friendly',halal:'Halal food options',nature:'Nature & outdoors',accessible:'Accessibility',guidesTitle:'Meet local guides',guidesSub:'Meet published local guides, or apply to join the VIA LOCAL guide network.',guidesFeatureSub:'Connect with reviewed local guides.',noRating:'No rating',accessSub:'Available accessibility information and helpful communication tools.',viewProfile:'View profile',book:'Request a tour',accessTitle:'A more inclusive travel experience',mapTitle:'Accessibility map',mapSub:'Choose a destination to view its map and review available accessibility details.',communication:'Text-to-speech',communicationSub:'Type a phrase and your browser may read it aloud.',typeHere:'Type what you want to say...',speak:'Speak phrase',stop:'Stop speech',location:'Sort by my location',locationHelp:'Optional: use your location to sort destinations from nearest to farthest. Your coordinates are not stored.',locationLoading:'Finding your location…',locationEnabled:'Nearest-first sorting is on',clearLocation:'Turn off location',featured:'Featured destinations',categories:'Discover new experiences',history:'History & culture',familyCat:'Families & kids',food:'Restaurants & cafes',accessibleCat:'Accessible travel',rating:'Rating',distance:'Area',details:'Details',footer:'Your journey starts with understanding the place.',requestSent:'This submits a tour inquiry, not a confirmed booking.',close:'Close',searchResults:'Discovery results',noResults:'No matches. Try changing your search or filters.',filter:'Filters',favoritesFilter:'Favorites',clearFilters:'Clear search and filters',language:'العربية',verifiedNote:'Check official visitor information before your trip. Ratings and availability are not live.',saved:'Added to favorites.',unsaved:'Removed from favorites.',save:'Save to favorites',savedLabel:'Saved',homeAria:'Go to home',menuAria:'Open menu',saveAria:'Save place to favorites'}
 };
 
 const placeEN = {
@@ -53,9 +53,28 @@ const placeEN = {
 15:{name:'Tiwanaku',city:'Tiwanaku',category:'Archaeological',distance:'La Paz region · Bolivia',tags:['Pre-Inca','Monuments','Bolivia'],description:'A major pre-Hispanic ceremonial and political centre on the Andean Altiplano, known for monumental stone architecture.'},
 16:{name:'Sukhothai Historical Park',city:'Sukhothai',category:'Archaeological',distance:'Thailand',tags:['History','Buddhist monuments','Thailand'],description:'A historic park preserving temples, Buddhist images, and remains of the Sukhothai kingdom.'}
 };
+const categoryLabels = {
+  history:{ar:'تاريخي',en:'Historic'},heritage:{ar:'تراثي',en:'Heritage'},
+  culture:{ar:'ثقافي',en:'Cultural'},nature:{ar:'طبيعة',en:'Nature'},
+  archaeological:{ar:'أثري',en:'Archaeological'},coast:{ar:'ساحلي',en:'Coastal'},
+  museum:{ar:'متحف',en:'Museum'}
+};
 function localizedPlace(p,lang){
-  if (p.name_en || p.city_en) return lang==='en' ? {...p,name:p.name_en||p.name,city:p.city_en||p.city,category:p.category_en||p.category,distance:p.city_en||p.distance,description:p.description_en||p.description,tags:p.tags||[]} : {...p,name:p.name_ar||p.name,city:p.city_ar||p.city,distance:p.city_ar||p.distance,description:p.description_ar||p.description,tags:p.tags||[]};
+  const city = lang==='en' ? (p.city_en||p.city||'') : (p.city_ar||p.city||'');
+  const country = lang==='en' ? (p.country_en||'') : (p.country_ar||'');
+  const name = lang==='en' ? (p.name_en||p.name||'') : (p.name_ar||p.name||'');
+  const category = (lang==='en' ? p.category_en : p.category_ar) || categoryLabels[p.category]?.[lang] || p.category || '';
+  const description = lang==='en' ? (p.description_en||p.description||'') : (p.description_ar||p.description||'');
+  if (p.name_en || p.city_en || p.country_en) return {...p,name,city,country,category,distance:[city,country].filter(Boolean).join(' · ')||p.distance||'',description,tags:p.tags||[]};
   return lang==='en'?{...p,...(placeEN[p.id]||{})}:p;
+}
+function distanceKm(place,origin){
+  const lat=Number(place.latitude), lon=Number(place.longitude);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)) return null;
+  const rad=n=>n*Math.PI/180;
+  const dLat=rad(lat-origin.latitude), dLon=rad(lon-origin.longitude);
+  const a=Math.sin(dLat/2)**2+Math.cos(rad(origin.latitude))*Math.cos(rad(lat))*Math.sin(dLon/2)**2;
+  return 6371*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
 
 function Website() {
@@ -68,7 +87,17 @@ function Website() {
   const [worldHasMore, setWorldHasMore] = useState(true);
   const [worldError, setWorldError] = useState('');
   const [mapPlaceId, setMapPlaceId] = useState('');
-  useEffect(() => { fetch('/api/catalog').then(r => r.ok ? r.json() : null).then(d => { if (d) setLiveCatalog(d); }).catch(() => {}); }, []);
+  const [userCoords, setUserCoords] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState('');
+  useEffect(() => {
+    let active = true;
+    fetch('/api/catalog')
+      .then(async response => { if (!response.ok) throw new Error('Catalog unavailable'); return response.json(); })
+      .then(data => { if (active) { setLiveCatalog(data); setCatalogError(''); } })
+      .catch(() => { if (active) setCatalogError(lang==='ar'?'تعذر تحميل قاعدة بيانات الوجهات؛ نعرض الأماكن المتاحة مؤقتًا.':'The destinations database could not load; showing the available places for now.'); });
+    return () => { active = false; };
+  }, [lang]);
   const loadWorldPlaces = async () => {
     if (worldLoading || !worldHasMore) return;
     setWorldLoading(true); setWorldError('');
@@ -101,9 +130,11 @@ function Website() {
   const t = copy[lang];
   const rtl = lang === 'ar';
   const databasePlaces = liveCatalog.destinations.length ? liveCatalog.destinations.map(d => ({
-    id:d.id, name_ar:d.name_ar, name_en:d.name_en, city_ar:d.city_ar, city_en:d.city_en,
+    id:d.id, slug:d.slug, name_ar:d.name_ar, name_en:d.name_en, city_ar:d.city_ar, city_en:d.city_en,
     country_ar:d.country_ar, country_en:d.country_en, name:d.name_ar, city:d.city_ar||d.city_en,
-    category:d.category, distance:d.city_ar||d.city_en, description_ar:d.description_ar, description_en:d.description_en,
+    category:d.category, category_ar:d.category_ar, category_en:d.category_en,
+    distance:[d.city_ar||d.city_en,d.country_ar||d.country_en].filter(Boolean).join(' · '),
+    description_ar:d.description_ar, description_en:d.description_en,
     image:d.image_url, tags:d.tags||[], family:d.family_friendly, nature:d.nature, accessible:d.accessible,
     halal_options:d.halal_options, accessibility_details:d.accessibility_details, latitude:d.latitude, longitude:d.longitude,
     ratingAvg:liveCatalog.ratings?.destinations?.[d.id]?.average||0, reviewCount:liveCatalog.ratings?.destinations?.[d.id]?.count||0
@@ -116,11 +147,18 @@ function Website() {
     initials:(g.name_ar||'V').slice(0,2), isLive:true, verified:g.verified
   }));
 
-  const filteredPlaces = useMemo(() => placeList.filter(p => {
-    const lp = localizedPlace(p, lang); const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')} ${lp.name} ${lp.city} ${lp.category} ${lp.tags.join(' ')}`.toLowerCase().includes(query.trim().toLowerCase());
-    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي','Archaeological','Historic','Heritage','Cultural'].includes(lp.category)) || (filter === 'accessible' && p.accessible) || (filter === 'halal' && p.halal_options) || (filter === 'favorites' && favorites.includes(p.id));
-    return matchesQuery && matchesFilter;
-  }), [placeList, query, filter, lang, favorites]);
+  const filteredPlaces = useMemo(() => {
+    const results = placeList.filter(p => {
+      const lp = localizedPlace(p,lang);
+      const searchable = [p.name,p.city,p.country_ar,p.country_en,p.category,(p.tags||[]).join(' '),lp.name,lp.city,lp.country,lp.category,lp.distance,(lp.tags||[]).join(' ')].join(' ').toLowerCase();
+      const matchesQuery = searchable.includes(query.trim().toLowerCase());
+      const matchesFilter = filter==='all' || (filter==='family'&&p.family) || (filter==='nature'&&p.nature) || (filter==='history'&&['أثري','تاريخي','تراثي','Archaeological','Historic','Heritage','Cultural','History'].includes(lp.category)) || (filter==='accessible'&&p.accessible) || (filter==='halal'&&p.halal_options) || (filter==='favorites'&&favorites.includes(p.id));
+      return matchesQuery && matchesFilter;
+    });
+    if(!userCoords) return results;
+    return results.map(place=>({...place,nearbyKm:distanceKm(place,userCoords)}))
+      .sort((a,b)=>(a.nearbyKm??Infinity)-(b.nearbyKm??Infinity));
+  },[placeList,query,filter,lang,favorites,userCoords]);
 
   const notify = (message) => {
     setNotice(message);
@@ -128,12 +166,24 @@ function Website() {
   };
 
   const requestLocation = () => {
-    if (!navigator.geolocation) return notify(rtl ? 'المتصفح لا يدعم تحديد الموقع.' : 'Geolocation is not supported by this browser.');
+    if (!navigator.geolocation) return notify(rtl?'المتصفح لا يدعم تحديد الموقع.':'Geolocation is not supported by this browser.');
+    setLocationLoading(true);
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => setLocationText(`${coords.latitude.toFixed(3)}, ${coords.longitude.toFixed(3)}`),
-      () => notify(rtl ? 'تعذر الوصول إلى موقعك. يمكنك الاستمرار دون تحديد الموقع.' : 'Could not access your location. You can continue without it.')
+      ({coords}) => {
+        setUserCoords({latitude:coords.latitude,longitude:coords.longitude});
+        setLocationText(rtl?'تم ترتيب الوجهات من الأقرب إلى الأبعد. لا يتم حفظ إحداثياتك.':'Destinations are sorted nearest-first. Your coordinates are not stored.');
+        setLocationLoading(false);
+      },
+      error => {
+        setLocationLoading(false);
+        notify(error?.code===1
+          ? (rtl?'إذن الموقع غير مفعّل. يمكنك الاستكشاف بدونه.':'Location permission was not granted. You can explore without it.')
+          : (rtl?'تعذر تحديد موقعك الآن؛ يمكنك الاستكشاف دون الموقع.':'Could not determine your location. You can continue without it.'));
+      },
+      {enableHighAccuracy:false,timeout:12000,maximumAge:60000}
     );
   };
+  const clearLocation = () => { setUserCoords(null); setLocationText(''); notify(rtl?'تم إيقاف ترتيب الأماكن حسب موقعك.':'Nearby sorting has been turned off.'); };
 
   const speak = () => {
     if (!speechText.trim()) return notify(rtl ? 'اكتب عبارة أولًا.' : 'Please type a phrase first.');
@@ -202,7 +252,11 @@ function Website() {
                 <input value={query} onChange={e => setQuery(e.target.value)} placeholder={t.search}/>
                 <button onClick={() => navigate('explore')}>{t.start}<ArrowUpLeft size={17}/></button>
               </div>
-              <div className="location-row"><button onClick={requestLocation}><LocateFixed size={16}/>{t.location}</button><span>{locationText || t.locationHelp}</span></div>
+              <div className="location-row">
+                <button onClick={requestLocation} disabled={locationLoading}><LocateFixed size={16}/>{locationLoading?t.locationLoading:(userCoords?t.locationEnabled:t.location)}</button>
+                {userCoords&&<button className="location-clear" onClick={clearLocation}>{t.clearLocation}</button>}
+                <span>{locationText||t.locationHelp}</span>
+              </div>
             </div>
           </section>
           <section className="container section">
@@ -229,6 +283,7 @@ function Website() {
           </div>
           <div className="results-caption"><span><SlidersHorizontal size={16}/>{t.searchResults}</span><small>{filteredPlaces.length} {rtl ? 'أماكن' : 'places'}</small></div>
           {filteredPlaces.length ? <PlaceGrid items={filteredPlaces} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} onSelect={setSelectedPlace}/> : <div className="empty-state"><Search size={30}/><p>{t.noResults}</p><button className="btn-outline" onClick={() => {setQuery('');setFilter('all');notify(rtl ? 'تم مسح البحث والفلاتر.' : 'Search and filters cleared.')}}>{t.clearFilters}</button></div>}
+          {catalogError && <p className="disclaimer">{catalogError}</p>}
           {worldError && <p className="disclaimer">{worldError}</p>}
           {worldHasMore && <div className="load-more-wrap"><button className="btn-outline" disabled={worldLoading} onClick={loadWorldPlaces}>{worldLoading ? (rtl?'جارٍ تحميل الوجهات…':'Loading destinations…') : (rtl?'تحميل المزيد من وجهات العالم':'Load more destinations')}</button><small>{rtl?'استكشف المزيد من الوجهات العالمية بصورها.':'Discover more destinations around the world, with photos.'}</small></div>}
         </section>}
@@ -263,7 +318,7 @@ function Website() {
 }
 
 function PlaceGrid({items, t, lang, favorites, toggleFavorite, notify, onSelect}) {
-  return <div className="place-grid">{items.map(p => { const lp = localizedPlace(p, lang); return <article className="place-card" key={p.id}><div className="place-image-wrap"><img src={p.image} alt={lp.name} onError={e=>{const el=e.currentTarget;el.style.display='none';el.parentElement?.classList.add('image-unavailable');el.parentElement?.setAttribute('data-fallback',lang==='ar'?'الصورة غير متاحة':'Image unavailable')}}/><button className={favorites.includes(p.id) ? 'favorite saved' : 'favorite'} onClick={() => {toggleFavorite(p.id);notify(favorites.includes(p.id)?t.unsaved:t.saved)}} aria-label={favorites.includes(p.id) ? t.savedLabel : t.saveAria}><Heart size={18} fill={favorites.includes(p.id) ? 'currentColor' : 'none'}/></button><span className="place-category">{lp.category}</span></div><div className="place-info"><div className="place-title-row"><h3>{lp.name}</h3><span className="rating">{p.ratingAvg ? <><Star size={13} fill="currentColor"/>{p.ratingAvg} ({p.reviewCount||0})</> : t.noRating}</span></div><p>{lp.description}</p><div className="place-meta"><span><MapPin size={14}/>{lp.city}</span><span><Clock3 size={14}/>{lp.distance}</span></div><div className="tag-row">{p.nature && <span><Map size={12}/>{t.nature}</span>}{p.family && <span><Baby size={12}/>{t.family}</span>}{p.accessible && <span><Accessibility size={12}/>{t.accessible}</span>}</div><button className="place-details" onClick={() => onSelect(p)}>{t.details}<ChevronLeft size={16}/></button></div></article>})}</div>;
+  return <div className="place-grid">{items.map(p => { const lp = localizedPlace(p, lang); return <article className="place-card" key={p.id}><div className="place-image-wrap"><img src={p.image} alt={lp.name} onError={e=>{const el=e.currentTarget;el.style.display='none';el.parentElement?.classList.add('image-unavailable');el.parentElement?.setAttribute('data-fallback',lang==='ar'?'الصورة غير متاحة':'Image unavailable')}}/><button className={favorites.includes(p.id) ? 'favorite saved' : 'favorite'} onClick={() => {toggleFavorite(p.id);notify(favorites.includes(p.id)?t.unsaved:t.saved)}} aria-label={favorites.includes(p.id) ? t.savedLabel : t.saveAria}><Heart size={18} fill={favorites.includes(p.id) ? 'currentColor' : 'none'}/></button><span className="place-category">{lp.category}</span></div><div className="place-info"><div className="place-title-row"><h3>{lp.name}</h3><span className="rating">{p.ratingAvg ? <><Star size={13} fill="currentColor"/>{p.ratingAvg} ({p.reviewCount||0})</> : t.noRating}</span></div><p>{lp.description}</p><div className="place-meta"><span><MapPin size={14}/>{lp.city}</span><span><Clock3 size={14}/>{lp.distance}</span>{Number.isFinite(p.nearbyKm)&&<span><LocateFixed size={14}/>{p.nearbyKm<1?(lang==='ar'?'أقل من 1 كم':'Under 1 km'):`${Math.round(p.nearbyKm)} ${lang==='ar'?'كم':'km'}`}</span>}</div><div className="tag-row">{p.nature && <span><Map size={12}/>{t.nature}</span>}{p.family && <span><Baby size={12}/>{t.family}</span>}{p.accessible && <span><Accessibility size={12}/>{t.accessible}</span>}</div><button className="place-details" onClick={() => onSelect(p)}>{t.details}<ChevronLeft size={16}/></button></div></article>})}</div>;
 }
 
 export default function App(){ return window.location.pathname.replace(/\/$/,'') === '/admin' ? <Admin/> : <Website/>; }
