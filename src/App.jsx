@@ -101,7 +101,8 @@ function App() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const toggleFavorite = (id) => setFavorites(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);\n  const navigate = (nextTab) => { setTab(nextTab); setMobileMenu(false); window.scrollTo({top:0,behavior:'smooth'}); };
+  const toggleFavorite = (id) => setFavorites(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const navigate = (nextTab) => { setTab(nextTab); setMobileMenu(false); window.scrollTo({top:0,behavior:'smooth'}); };
   const sharePlace = async (place) => { const lp = localizedPlace(place, lang); const shareText = `${lp.name} — ${lp.city}\n${lp.description}`; try { if (navigator.share) await navigator.share({title:lp.name,text:shareText}); else {await navigator.clipboard.writeText(shareText);notify(rtl?'تم نسخ تفاصيل الوجهة.':'Destination details copied.');} } catch (err) { if (err?.name !== 'AbortError') notify(rtl?'تعذر مشاركة الوجهة.':'Could not share destination.'); } };
 
   const navItems = [
