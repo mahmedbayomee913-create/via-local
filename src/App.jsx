@@ -269,7 +269,7 @@ function Website() {
           </section>
           <section className="container section">
             <div className="section-heading"><div><span className="eyebrow gold-text">{t.featured}</span><h2>{t.exploreTitle}</h2></div><button className="text-link" onClick={() => navigate('explore')}>{t.details}<ChevronLeft size={17}/></button></div>
-            <PlaceGrid items={placeList.slice(0,3)} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} onSelect={setSelectedPlace}/>
+            <PlaceGrid items={placeList.slice(0,6)} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} onSelect={setSelectedPlace}/>
           </section>
         </>}
 
