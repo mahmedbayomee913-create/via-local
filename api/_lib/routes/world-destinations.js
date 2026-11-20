@@ -1,32 +1,51 @@
 const CACHE_MS=30*60*1000;
-const cache=new Map();
-const TYPES=['Q570116','Q839954','Q4989906','Q9259','Q46169','Q33506','Q151885','Q17350442'];
-function commonsUrl(raw){return raw?raw.replace('http://commons.wikimedia.org/','https://commons.wikimedia.org/'):'';}
-async function fetchPage(offset,limit){
-  const key=offset+':'+limit,hit=cache.get(key);
-  if(hit&&Date.now()-hit.at<CACHE_MS)return hit.items;
-  const query=`SELECT DISTINCT ?place ?placeLabel ?image ?coord WHERE {
-    VALUES ?type { ${TYPES.map(x=>'wd:'+x).join(' ')} }
-    ?place wdt:P31 ?type; wdt:P18 ?image; wdt:P625 ?coord.
-    SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-  } ORDER BY ?placeLabel LIMIT ${limit} OFFSET ${offset}`;
-  const url='https://query.wikidata.org/sparql?query='+encodeURIComponent(query)+'&format=json';
-  const response=await fetch(url,{headers:{Accept:'application/sparql-results+json','User-Agent':'VIA LOCAL destination discovery/1.0 (https://via-local.vercel.app)'},signal:AbortSignal.timeout(8500)});
-  if(!response.ok)throw new Error('Wikidata API returned '+response.status);
-  const data=await response.json();
-  const items=(data.results?.bindings||[]).map(row=>{
-    const qid=row.place.value.split('/').pop(),coords=row.coord?.value?.match(/Point\(([-0-9.]+) ([-0-9.]+)\)/),name=row.placeLabel?.value||qid;
-    return {id:'wikidata-'+qid,slug:qid.toLowerCase(),name_ar:name,name_en:name,city_ar:'',city_en:'',country_ar:'',country_en:'',category:'world',description_ar:'',description_en:'',image_url:commonsUrl(row.image?.value),tags:['Worldwide','Wikidata'],family_friendly:false,nature:false,accessible:false,latitude:coords?Number(coords[2]):null,longitude:coords?Number(coords[1]):null,featured:false,published:true,source_url:row.place.value};
-  });
-  cache.set(key,{items,at:Date.now()});
-  return items;
+const memberCache={items:null,at:0};
+const detailCache=new Map();
+const CATEGORIES=['Tourist attractions','World Heritage Sites','Archaeological sites','Historic sites','National parks','Museums'];
+async function wikiFetch(params){
+  const url='https://en.wikipedia.org/w/api.php?'+new URLSearchParams({action:'query',format:'json',...params});
+  const response=await fetch(url,{headers:{'User-Agent':'VIA LOCAL destination catalog/1.0 (https://via-local.vercel.app)','Api-User-Agent':'VIA LOCAL destination catalog/1.0'},signal:AbortSignal.timeout(7000)});
+  if(!response.ok)throw new Error('Wikipedia API returned '+response.status);
+  return response.json();
+}
+async function getMembers(){
+  if(memberCache.items&&Date.now()-memberCache.at<CACHE_MS)return memberCache.items;
+  const lists=[];
+  for(let i=0;i<CATEGORIES.length;i+=3){
+    const batch=await Promise.all(CATEGORIES.slice(i,i+3).map(category=>
+      wikiFetch({list:'categorymembers',cmtitle:'Category:'+category,cmnamespace:'0',cmlimit:'500'})
+      .then(data=>(data.query?.categorymembers||[]).map(p=>({...p,category}))).catch(()=>[])
+    ));
+    lists.push(...batch);
+  }
+  const unique=new Map();
+  for(const list of lists)for(const page of list)if(!unique.has(page.pageid))unique.set(page.pageid,page);
+  memberCache.items=[...unique.values()].sort((a,b)=>a.title.localeCompare(b.title));
+  memberCache.at=Date.now();
+  return memberCache.items;
+}
+async function getPageDetails(pageIds){
+  const groups=[];
+  for(let i=0;i<pageIds.length;i+=40)groups.push(pageIds.slice(i,i+40));
+  await Promise.all(groups.map(async ids=>{
+    const missing=ids.filter(id=>!detailCache.has(id));
+    if(!missing.length)return;
+    const data=await wikiFetch({pageids:missing.join('|'),prop:'pageimages|extracts|coordinates',piprop:'thumbnail',pithumbsize:'1200',exintro:'1',explaintext:'1',exchars:'450'});
+    for(const page of Object.values(data.query?.pages||{}))detailCache.set(page.pageid,{pageid:page.pageid,title:page.title,description:page.extract||'',image:page.thumbnail?.source||'',coords:page.coordinates?.[0]||null});
+  }));
+  return pageIds.map(id=>detailCache.get(id)).filter(p=>p&&p.image);
 }
 export default async function handler(req,res){
   if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});
   try{
-    const offset=Math.max(0,Math.min(2000,Number.parseInt(req.query?.offset||'0',10)||0));
+    const offset=Math.max(0,Math.min(3000,Number.parseInt(req.query?.offset||'0',10)||0));
     const limit=Math.max(1,Math.min(80,Number.parseInt(req.query?.limit||'80',10)||80));
-    const items=await fetchPage(offset,limit);
-    return res.status(200).json({items,offset,nextOffset:offset+items.length,limit,total:null,hasMore:items.length===limit&&offset+items.length<2000,source:'Wikidata / Wikimedia Commons'});
+    const members=await getMembers();
+    const batch=members.slice(offset,offset+limit);
+    const pages=await getPageDetails(batch.map(p=>p.pageid));
+    const categoryById=new Map(batch.map(p=>[p.pageid,p.category]));
+    const items=pages.map(p=>({id:'wiki-'+p.pageid,slug:String(p.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),name_ar:p.title,name_en:p.title,city_ar:'',city_en:'',country_ar:'',country_en:'',category:categoryById.get(p.pageid)||'world',description_ar:p.description,description_en:p.description,image_url:p.image,tags:['Worldwide','Wikipedia'],family_friendly:false,nature:false,accessible:false,latitude:p.coords?.lat??null,longitude:p.coords?.lon??null,featured:false,published:true,source_url:'https://en.wikipedia.org/wiki/'+encodeURIComponent(p.title.replace(/ /g,'_'))}));
+    const nextOffset=offset+batch.length;
+    return res.status(200).json({items,offset,nextOffset,limit,total:members.length,hasMore:nextOffset<members.length,source:'Wikipedia / Wikimedia Commons'});
   }catch(error){return res.status(502).json({error:'World destination source unavailable',detail:error?.message||'Fetch failed'});}
 }
