@@ -42,9 +42,10 @@ The production catalogue contains 76 published tourist destinations across 30 co
 ### Separate admin dashboard
 - Private sign-in using an HttpOnly, Secure session cookie.
 - Guide inquiry management, search, statuses, details, delete and CSV export.
-- CMS CRUD for destinations, guides, experiences and content pages.
-- Booking status management.
+- CMS CRUD for destinations, guides, experiences and content pages; published CMS pages appear in the public website navigation.
+- Booking status management and manual booking creation from published experiences.
 - Review moderation.
+- Digital passport visit moderation, verification and points assignment.
 - Guide application review and approval; an approved application creates an unpublished guide profile that an admin can verify and publish.
 - Content can be saved as a draft before it is visible publicly.
 
