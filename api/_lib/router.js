@@ -1,5 +1,6 @@
 import guideRequests from './routes/guide-requests.js';
 import catalog from './routes/catalog.js';
+import worldDestinations from './routes/world-destinations.js';
 import bookings from './routes/bookings.js';
 import reviews from './routes/reviews.js';
 import itinerary from './routes/itinerary.js';
@@ -33,6 +34,7 @@ export default async function handler(req, res) {
 
   if (section === 'guide-requests') return guideRequests(req, res);
   if (section === 'catalog') return catalog(req, res);
+  if (section === 'world-destinations') return worldDestinations(req, res);
   if (section === 'bookings') return bookings(req, res);
   if (section === 'reviews') return reviews(req, res);
   if (section === 'itinerary') return itinerary(req, res);
