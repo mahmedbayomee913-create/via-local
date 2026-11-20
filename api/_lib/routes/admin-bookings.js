@@ -1,5 +1,6 @@
 import { db } from '../db.js';
 import { isAdmin } from '../auth.js';
+import { isValidISODate } from '../validation.js';
 
 const clean = (value, max) => String(value ?? '').trim().slice(0, max);
 const statuses = new Set(['pending','accepted','confirmed','cancelled','completed','rejected']);
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
       const experienceId = clean(body.experience_id, 36);
       const guests = Number(body.guests || 1);
       const status = clean(body.status, 20) || 'pending';
-      if (!customer_name || !customer_phone || !/^\d{4}-\d{2}-\d{2}$/.test(booking_date) || !/^[0-9a-f-]{36}$/i.test(experienceId) || !Number.isInteger(guests) || guests < 1 || guests > 30 || !statuses.has(status)) {
+      if (!customer_name || !customer_phone || !isValidISODate(booking_date) || !/^[0-9a-f-]{36}$/i.test(experienceId) || !Number.isInteger(guests) || guests < 1 || guests > 30 || !statuses.has(status)) {
         return res.status(400).json({ error: 'Complete all required booking fields with valid values.' });
       }
       if (booking_date < new Date().toISOString().slice(0, 10)) return res.status(400).json({ error: 'Booking date cannot be in the past.' });
