@@ -5,10 +5,8 @@
       "destination": "/api/dispatch?route=:first/:rest*"
     },
     {
-      "0": {
-        "source": "/admin",
-        "destination": "/"
-      }
+      "source": "/admin",
+      "destination": "/"
     }
   ]
 }
