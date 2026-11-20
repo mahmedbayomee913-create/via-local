@@ -68,7 +68,8 @@ function App() {
   const [notice, setNotice] = useState('');
   const [locationText, setLocationText] = useState('');
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [mobileMenu, setMobileMenu] = useState(false);\n  useEffect(() => { try { localStorage.setItem('via-local:lang', lang); } catch {} }, [lang]);
+  const [mobileMenu, setMobileMenu] = useState(false);
+  useEffect(() => { try { localStorage.setItem('via-local:lang', lang); } catch {} }, [lang]);
   const t = copy[lang];
   const rtl = lang === 'ar';
 
