@@ -27,7 +27,7 @@ const contentTypes = {
     ar: 'التجارب والجولات', en: 'Experiences',
     fields: [
       ['slug','الرابط المختصر','Slug','text',true],['title_ar','اسم التجربة بالعربية','Arabic title','text',true],['title_en','اسم التجربة بالإنجليزية','English title','text',true],
-      ['description_ar','الوصف بالعربية','Arabic description','textarea'],['description_en','الوصف بالإنجليزية','English description','textarea'],['destination_id','معرّف الوجهة','Destination ID','text'],['guide_id','معرّف المرشد','Guide ID','text'],
+      ['description_ar','الوصف بالعربية','Arabic description','textarea'],['description_en','الوصف بالإنجليزية','English description','textarea'],['destination_id','الوجهة','Destination','select',true],['guide_id','المرشد (اختياري)','Guide (optional)','select'],
       ['duration_minutes','المدة بالدقائق','Duration in minutes','number'],['price','السعر للفرد','Price per guest','number'],['currency','العملة','Currency','text'],['capacity','السعة القصوى','Capacity','number'],
       ['schedule','المواعيد JSON','Schedule JSON','json'],['accessible_features','مميزات الوصول JSON','Accessibility JSON','json'],['published','متاحة للحجز','Published / bookable','boolean']
     ]
@@ -57,6 +57,8 @@ export default function AdminWorkspace({ section, lang='ar' }) {
   const [saving,setSaving] = useState(false);
   const [search,setSearch] = useState('');
   const [experienceOptions,setExperienceOptions] = useState([]);
+  const [contentDestinations,setContentDestinations] = useState([]);
+  const [contentGuides,setContentGuides] = useState([]);
   const [manualBooking,setManualBooking] = useState({experience_id:'',customer_name:'',customer_phone:'',customer_email:'',booking_date:'',guests:1,notes:'',status:'pending'});
   const [showManualBooking,setShowManualBooking] = useState(false);
   const [savingBooking,setSavingBooking] = useState(false);
@@ -74,6 +76,16 @@ export default function AdminWorkspace({ section, lang='ar' }) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not load data.');
       setItems(data.items || data.bookings || data.reviews || data.applications || []);
+      if (section === 'content' && type === 'experiences') {
+        const [destResponse, guideResponse] = await Promise.all([
+          fetch('/api/admin/content?type=destinations'),
+          fetch('/api/admin/content?type=guides')
+        ]);
+        const [destData, guideData] = await Promise.all([destResponse.json(), guideResponse.json()]);
+        if (!destResponse.ok || !guideResponse.ok) throw new Error('Could not load destination and guide choices.');
+        setContentDestinations(destData.items || []);
+        setContentGuides(guideData.items || []);
+      }
       if (section === 'bookings') {
         const experienceResponse = await fetch('/api/admin/content?type=experiences');
         const experienceData = await experienceResponse.json();
@@ -148,7 +160,7 @@ export default function AdminWorkspace({ section, lang='ar' }) {
       {editing!==null && <form className="workspace-form" onSubmit={saveContent}>
         <div className="workspace-form-head"><strong>{editing==='new'?t('إضافة عنصر جديد','Create item'):t('تعديل العنصر','Edit item')}</strong><button type="button" onClick={()=>setEditing(null)}><X size={17}/></button></div>
         <div className="workspace-fields">{fields.map(([key,labelAr,labelEn,kind,required])=><label key={key} className={kind==='textarea'||kind==='json'?'wide':''}>{rtl?labelAr:labelEn}{required?' *':''}
-          {kind==='textarea'||kind==='json'?<textarea rows={kind==='json'?3:2} value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})} placeholder={kind==='json'?'{}':''}/>:kind==='boolean'?<input type="checkbox" checked={!!form[key]} onChange={e=>setForm({...form,[key]:e.target.checked})}/>:<input type={kind==='number'?'number':'text'} step={kind==='number'?'any':undefined} value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})}/>}
+          {kind==='textarea'||kind==='json'?<textarea rows={kind==='json'?3:2} value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})} placeholder={kind==='json'?'{}':''}/>:kind==='boolean'?<input type="checkbox" checked={!!form[key]} onChange={e=>setForm({...form,[key]:e.target.checked})}/>:kind==='select'?<select required={required} value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})}><option value="">{rtl?'اختر':'Select'}</option>{(key==='destination_id'?contentDestinations:contentGuides).map(item=><option value={item.id} key={item.id}>{item.name_ar||item.title_ar||item.name_en||item.title_en||item.slug}{key==='destination_id'&&item.city_ar?' · '+item.city_ar:''}</option>)}</select>:<input type={kind==='number'?'number':'text'} step={kind==='number'?'any':undefined} value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})}/>}
         </label>)}</div>
         <div className="workspace-form-actions"><button type="button" className="workspace-quiet" onClick={()=>setEditing(null)}>{t('إلغاء','Cancel')}</button><button className="workspace-primary" disabled={saving}><Save size={16}/>{saving?t('جارٍ الحفظ...','Saving...'):t('حفظ','Save')}</button></div>
       </form>}
