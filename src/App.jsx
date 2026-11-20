@@ -58,7 +58,7 @@ const placeEN = {
 function localizedPlace(p,lang){return lang==='en'?{...p,...(placeEN[p.id]||{})}:p;}
 
 function App() {
-  const [lang, setLang] = useState('ar');
+  const [lang, setLang] = useState(() => { try { return localStorage.getItem('via-local:lang') === 'en' ? 'en' : 'ar'; } catch { return 'ar'; } });
   const [tab, setTab] = useState('home');
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
@@ -68,13 +68,13 @@ function App() {
   const [notice, setNotice] = useState('');
   const [locationText, setLocationText] = useState('');
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [mobileMenu, setMobileMenu] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);\n  useEffect(() => { try { localStorage.setItem('via-local:lang', lang); } catch {} }, [lang]);
   const t = copy[lang];
   const rtl = lang === 'ar';
 
   const filteredPlaces = useMemo(() => places.filter(p => {
-    const lp = localizedPlace(p, lang); const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')} ${lp.name} ${lp.city} ${lp.category} ${lp.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي','Archaeological','Historic','Heritage','Cultural'].includes(lp.category)) || (filter === 'favorites' && favorites.includes(p.id));
+    const lp = localizedPlace(p, lang); const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')} ${lp.name} ${lp.city} ${lp.category} ${lp.tags.join(' ')}`.toLowerCase().includes(query.trim().toLowerCase());
+    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي','Archaeological','Historic','Heritage','Cultural'].includes(lp.category)) || (filter === 'accessible' && p.accessible) || (filter === 'favorites' && favorites.includes(p.id));
     return matchesQuery && matchesFilter;
   }), [query, filter, lang, favorites]);
 
@@ -100,7 +100,7 @@ function App() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const toggleFavorite = (id) => setFavorites(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const toggleFavorite = (id) => setFavorites(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);\n  const navigate = (nextTab) => { setTab(nextTab); setMobileMenu(false); window.scrollTo({top:0,behavior:'smooth'}); };
   const sharePlace = async (place) => { const lp = localizedPlace(place, lang); const shareText = `${lp.name} — ${lp.city}\n${lp.description}`; try { if (navigator.share) await navigator.share({title:lp.name,text:shareText}); else {await navigator.clipboard.writeText(shareText);notify(rtl?'تم نسخ تفاصيل الوجهة.':'Destination details copied.');} } catch (err) { if (err?.name !== 'AbortError') notify(rtl?'تعذر مشاركة الوجهة.':'Could not share destination.'); } };
 
   const navItems = [
@@ -113,19 +113,19 @@ function App() {
       <div className="announcement-bar"><Sparkles size={13}/><span>{t.announcement}</span><Sparkles size={13}/></div>
       <header className="header">
         <div className="container header-inner">
-          <button className="brand" onClick={() => setTab('home')} aria-label={t.homeAria}>
+          <button className="brand" onClick={() => navigate('home')} aria-label={t.homeAria}>
             <span className="brand-mark"><MapPin size={25} strokeWidth={2.5}/></span>
             <span className="brand-name arabic-brand">فيا لوكال<small>VIA LOCAL</small></span>
           </button>
           <nav className="desktop-nav">
-            {navItems.map(([id, label, Icon]) => <button key={id} className={tab === id ? 'nav-link active' : 'nav-link'} onClick={() => setTab(id)}><Icon size={17}/>{label}</button>)}
+            {navItems.map(([id, label, Icon]) => <button key={id} className={tab === id ? 'nav-link active' : 'nav-link'} onClick={() => navigate(id)}><Icon size={17}/>{label}</button>)}
           </nav>
           <div className="header-actions">
             <button className="language-btn" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}><Globe2 size={17}/>{t.language}</button>
             <button className="menu-btn" onClick={() => setMobileMenu(!mobileMenu)} aria-label={t.menuAria}>{mobileMenu ? <X/> : <Menu/>}</button>
           </div>
         </div>
-        {mobileMenu && <div className="mobile-nav">{navItems.map(([id, label, Icon]) => <button key={id} onClick={() => {setTab(id);setMobileMenu(false)}}><Icon size={18}/>{label}</button>)}</div>}
+        {mobileMenu && <div className="mobile-nav">{navItems.map(([id, label, Icon]) => <button key={id} onClick={() => navigate(id)}><Icon size={18}/>{label}</button>)}</div>}
       </header>
 
       <main>
@@ -138,23 +138,23 @@ function App() {
               <p className="hero-description">{t.sub}</p>
               <div className="hero-search">
                 <Search size={20}/>
-                <input value={query} onChange={e => {setQuery(e.target.value);setTab('explore')}} placeholder={t.search}/>
-                <button onClick={() => setTab('explore')}>{t.start}<ArrowUpLeft size={17}/></button>
+                <input value={query} onChange={e => {setQuery(e.target.value);navigate('explore')}} placeholder={t.search}/>
+                <button onClick={() => navigate('explore')}>{t.start}<ArrowUpLeft size={17}/></button>
               </div>
               <div className="location-row"><button onClick={requestLocation}><LocateFixed size={16}/>{t.location}</button><span>{locationText || t.locationHelp}</span></div>
             </div>
           </section>
           <section className="container section">
-            <div className="section-heading"><div><span className="eyebrow gold-text">{t.categories}</span><h2>{t.explore}</h2></div><button className="text-link" onClick={() => setTab('explore')}>{t.discover}<ChevronLeft size={17}/></button></div>
+            <div className="section-heading"><div><span className="eyebrow gold-text">{t.categories}</span><h2>{t.explore}</h2></div><button className="text-link" onClick={() => navigate('explore')}>{t.discover}<ChevronLeft size={17}/></button></div>
             <div className="feature-grid">
               <button className="feature-card feature-burgundy" onClick={() => setTab('explore')}><span className="feature-icon"><Compass/></span><strong>{t.explore}</strong><small>{t.exploreSub}</small><ArrowUpLeft className="feature-arrow"/></button>
-              <button className="feature-card feature-gold" onClick={() => setTab('guides')}><span className="feature-icon"><Users/></span><strong>{t.guides}</strong><small>{t.guidesFeatureSub}</small><ArrowUpLeft className="feature-arrow"/></button>
-              <button className="feature-card feature-light" onClick={() => setTab('access')}><span className="feature-icon"><Accessibility/></span><strong>{t.access}</strong><small>{t.accessSub}</small><ArrowUpLeft className="feature-arrow"/></button>
+              <button className="feature-card feature-gold" onClick={() => navigate('guides')}><span className="feature-icon"><Users/></span><strong>{t.guides}</strong><small>{t.guidesFeatureSub}</small><ArrowUpLeft className="feature-arrow"/></button>
+              <button className="feature-card feature-light" onClick={() => navigate('access')}><span className="feature-icon"><Accessibility/></span><strong>{t.access}</strong><small>{t.accessSub}</small><ArrowUpLeft className="feature-arrow"/></button>
             </div>
           </section>
           <section className="container section">
             <div className="section-heading"><div><span className="eyebrow gold-text">{t.featured}</span><h2>{t.exploreTitle}</h2></div><button className="text-link" onClick={() => setTab('explore')}>{t.details}<ChevronLeft size={17}/></button></div>
-            <PlaceGrid items={places.slice(8,11)} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} onSelect={setSelectedPlace}/>
+            <PlaceGrid items={places.slice(8,11)} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} onSelect={setSelectedPlace}/>
           </section>
         </>}
 
@@ -163,7 +163,7 @@ function App() {
           <div className="filter-panel">
             <div className="search-field"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder={t.search}/></div>
             <div className="filter-chips">
-              {[['all',t.all],['family',t.family],['nature',t.nature],['history',t.history],['favorites',t.favoritesFilter]].map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'chip selected' : 'chip'}>{label}</button>)}
+              {[['all',t.all],['family',t.family],['nature',t.nature],['history',t.history],['accessible',t.accessible],['favorites',t.favoritesFilter]].map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'chip selected' : 'chip'}>{label}</button>)}
             </div>
           </div>
           <div className="results-caption"><span><SlidersHorizontal size={16}/>{t.searchResults}</span><small>{filteredPlaces.length} {rtl ? 'أماكن' : 'places'}</small></div>
@@ -195,7 +195,7 @@ function App() {
   );
 }
 
-function PlaceGrid({items, t, lang, favorites, toggleFavorite, onSelect}) {
+function PlaceGrid({items, t, lang, favorites, toggleFavorite, notify, onSelect}) {
   return <div className="place-grid">{items.map(p => { const lp = localizedPlace(p, lang); return <article className="place-card" key={p.id}><div className="place-image-wrap"><img src={p.image} alt={lp.name}/><button className={favorites.includes(p.id) ? 'favorite saved' : 'favorite'} onClick={() => {toggleFavorite(p.id);notify(favorites.includes(p.id)?t.unsaved:t.saved)}} aria-label={favorites.includes(p.id) ? t.savedLabel : t.saveAria}><Heart size={18} fill={favorites.includes(p.id) ? 'currentColor' : 'none'}/></button><span className="place-category">{lp.category}</span></div><div className="place-info"><div className="place-title-row"><h3>{lp.name}</h3><span className="rating">{t.noRating}</span></div><p>{lp.description}</p><div className="place-meta"><span><MapPin size={14}/>{lp.city}</span><span><Clock3 size={14}/>{lp.distance}</span></div><div className="tag-row">{p.nature && <span><Map size={12}/>{t.nature}</span>}{p.family && <span><Baby size={12}/>{t.family}</span>}{p.accessible && <span><Accessibility size={12}/>{t.accessible}</span>}</div><button className="place-details" onClick={() => onSelect(p)}>{t.details}<ChevronLeft size={16}/></button></div></article>})}</div>;
 }
 
