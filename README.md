@@ -29,7 +29,7 @@ npm run preview
 
 ## حدود النسخة
 - الوجهات والمحتوى معلومات أولية، يجب التحقق من التفاصيل من المصادر الرسمية قبل الزيارة.
-- الصور قد تكون توضيحية ولا يوجد ربط بخدمة صور أو خرائط مباشرة.
+- صور الأماكن في البطاقات تم استبدالها بصور حقيقية من Wikimedia Commons. الصور تظل مستضافة خارجيًا وقد تتغير/تتوقف؛ يُرجى مراجعة صفحة كل ملف وشروط الترخيص قبل إعادة الاستخدام التجاري.
 - لا توجد قاعدة بيانات، حسابات، حجوزات، دفع، تقييمات فعلية أو توافر مباشر.
 - المرشدون ملفات تجريبية وليست أشخاصًا حقيقيين.
 - تحويل النص إلى صوت يعتمد على دعم المتصفح والأصوات المتاحة. لا توجد ترجمة للغة الإشارة أو تحويل الكلام إلى نص حاليًا.
@@ -42,3 +42,26 @@ npm run preview
 4. تسجيل دخول ولوحة إدارة.
 5. حجوزات حقيقية وإشعارات واختبارات أمان وإتاحة.
 6. تطبيق Android وiOS يستهلك نفس الـ API.
+
+
+## مصادر الصور (Wikimedia Commons)
+تم استخدام ملفات صور للمواقع نفسها بدل الصور العامة. راجع صفحة كل ملف للمؤلف والترخيص:
+
+| المكان | صفحة الصورة |
+|---|---|
+| جامع السلطان قابوس الأكبر | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sultan_Qaboos_Grand_Mosque_(1).jpg) |
+| سوق مطرح | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Muttrah%2C_Suoq-_PiC.1-_OMAN.jpg) |
+| قلعة نزوى | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Nizwa_Fort%2C_Oman_2024_3.jpg) |
+| وادي شاب | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Wadi_Shab_(11).jpg) |
+| وادي دربات | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Wadi_Darbat_2025.jpg) |
+| قلعة خصب | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Khasab_Fort.jpg) |
+| رمال الشرقية | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Dunes_in_Wahiba_Sands%2C_Oman.jpg) |
+| شاطئ المغسيل | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mughsayl_Beach_2.jpg) |
+| Göbekli Tepe | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Gobeklitepe.jpg) |
+| Derinkuyu | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Derinkuyu_Underground_City_T%C3%BCrkiye.jpg) |
+| Ħal-Saflieni Hypogeum | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Hypog%C3%A9e_Hal_Saflieni.jpg) |
+| Skara Brae | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Skara_Brae_2000-7.jpg) |
+| Djémila | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Djemila%2C_Algeria.jpg) |
+| Great Zimbabwe | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Great-Zimbabwe.jpg) |
+| Tiwanaku | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tiwanaku_Bolivia.jpg) |
+| Sukhothai | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sukhothai_historical_park.jpg) |
