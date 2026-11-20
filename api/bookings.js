@@ -12,11 +12,12 @@ export default async function handler(req, res) {
     const booking_date = clean(body.booking_date, 10);
     const guests = Number(body.guests || 1);
     const experienceId = clean(body.experience_id, 36);
+    if (!/^[0-9a-f-]{36}$/i.test(experienceId)) return res.status(400).json({ error: 'Choose a valid experience.' });
     if (!customer_name || !customer_phone || !/^\d{4}-\d{2}-\d{2}$/.test(booking_date) || !experienceId || !Number.isInteger(guests) || guests < 1 || guests > 30) {
       return res.status(400).json({ error: 'Please complete the required booking details.' });
     }
     if (booking_date < new Date().toISOString().slice(0, 10)) return res.status(400).json({ error: 'The selected date is in the past.' });
-    const rows = await db(`experiences?select=id,price,currency,capacity,destination_id,guide_id,title_ar,title_en& id=eq.${experienceId}&published=eq.true`.replace('& ', '&'));
+    const rows = await db(`experiences?select=id,price,currency,capacity,destination_id,guide_id,title_ar,title_en&id=eq.${experienceId}&published=eq.true`);
     const experience = rows?.[0];
     if (!experience) return res.status(404).json({ error: 'This experience is not currently available.' });
     if (guests > Number(experience.capacity)) return res.status(400).json({ error: 'The number of guests exceeds this experience capacity.' });
