@@ -22,7 +22,7 @@ The service-role key is not required. Database requests are made by server route
 ## Database setup
 Run `supabase/guide_requests.sql` in Supabase SQL Editor on a fresh project. It creates the guide inquiry table, destination catalog, guides, experiences, bookings, reviews, user profiles, itineraries, digital passport visits, guide applications, favorites and protected RLS policies.
 
-The production catalogue now contains 76 published tourist destinations across 30 countries, including 30 destinations in Egypt and the eight requested archaeological sites. Destination photos are served from Wikimedia Commons thumbnails, and all published destinations have coordinates. The optional browser-location control sorts discovery results from nearest to farthest; coordinates stay in the browser session and are not sent to or stored by the application. Guide and experience listings remain empty until real provider records are reviewed and published by the site operator.
+The production catalogue contains 76 published tourist destinations across 30 countries, including 30 destinations in Egypt and the eight requested archaeological sites. Destination photos are served from Wikimedia Commons thumbnails, and all published destinations have coordinates. The optional browser-location flow displays a privacy explanation before requesting browser permission; it sorts discovery results locally from nearest to farthest. Coordinates are not sent to or stored by the application. The guide directory currently includes 12 fictional demo profiles, each visibly labelled as a demo and marked with `is_demo`; admins can edit or delete them under Content → Guides. They are not real providers and must be replaced with verified real profiles before offering actual tours. Experiences remain empty until real activities are entered and published by the site operator.
 
 ## Included product features
 
@@ -30,7 +30,7 @@ The production catalogue now contains 76 published tourist destinations across 3
 - Arabic/English interface and destination discovery.
 - Live destination catalog loaded from Supabase, with filters and favorites.
 - Destination details with embedded map search.
-- Published local guide profiles.
+- Published local guide profiles, with fictional samples clearly marked as demos until replaced by real providers.
 - Trip planner that builds a starter itinerary from published destinations and experiences.
 - Booking requests with server-calculated price totals and a pending status.
 - Customer registration/sign-in through Supabase Auth, profile editing and booking history.
