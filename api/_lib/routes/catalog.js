@@ -36,9 +36,7 @@ async function resolveWikipediaImages(destinations) {
     const batchMap = new Map();
     for (const page of pages) {
       const image = page.thumbnail?.source;
-      if (image && /^https:\/\/(upload|thumb)\.wikimedia\.org\//i.test(image)) {
-        batchMap.set(titleKey(page.title), image);
-      }
+      if (image && /^https:\/\/(upload|thumb)\.wikimedia\.org\//i.test(image)) batchMap.set(titleKey(page.title), image);
     }
     for (const redirect of data.query?.redirects || []) {
       const image = batchMap.get(titleKey(redirect.to));
@@ -49,6 +47,43 @@ async function resolveWikipediaImages(destinations) {
       if (image) byTitle.set(titleKey(title), image);
     }
   }));
+
+  // Some destinations have Commons photos even when the article page has no thumbnail.
+  const commonsFiles = {
+    'Wadi Shab': 'File:Wadi Shab.jpg',
+    'Wadi Darbat': 'File:Wadi Darbat.jpg',
+    'Khasab Fort': 'File:Khasab Fort.jpg',
+    'Sharqiyah Sands': 'File:Wahiba Sands.jpg',
+    'Mughsail Beach': 'File:Mughsayl Beach.jpg'
+  };
+  const unresolved = Object.entries(commonsFiles).filter(([destination]) =>
+    titles.some(title => titleKey(title) === titleKey(destination)) && !byTitle.has(titleKey(destination))
+  );
+  if (unresolved.length) {
+    const params = new URLSearchParams({
+      action: 'query',
+      format: 'json',
+      titles: unresolved.map(([, file]) => file).join('|'),
+      prop: 'imageinfo',
+      iiprop: 'url',
+      iiurlwidth: '1200'
+    });
+    const response = await fetch('https://commons.wikimedia.org/w/api.php?' + params, {
+      headers: {
+        'User-Agent': 'VIA LOCAL destination image resolver/1.0 (https://via-local.vercel.app)',
+        'Api-User-Agent': 'VIA LOCAL destination image resolver/1.0'
+      },
+      signal: AbortSignal.timeout(7000)
+    });
+    if (!response.ok) throw new Error('Wikimedia Commons image lookup failed: ' + response.status);
+    const data = await response.json();
+    const pages = Object.values(data.query?.pages || {});
+    for (const [destination, file] of unresolved) {
+      const page = pages.find(item => titleKey(item.title) === titleKey(file));
+      const image = page?.imageinfo?.[0]?.thumburl || page?.imageinfo?.[0]?.url;
+      if (image && /^https:\/\/(upload|thumb)\.wikimedia\.org\//i.test(image)) byTitle.set(titleKey(destination), image);
+    }
+  }
 
   imageCache = { at: Date.now(), byTitle };
   return byTitle;
