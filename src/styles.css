@@ -46,3 +46,5 @@
 .place-modal.image-unavailable::before{content:attr(data-fallback);height:235px;display:grid;place-items:center;color:#78666c;font-size:12px;font-weight:800;background:linear-gradient(135deg,#f1e9df,#e5d8cc)}
 .place-modal.image-unavailable>img{display:none}
 .place-modal.image-unavailable .modal-close{z-index:2}
+
+.location-row .location-clear{background:transparent;border-style:dashed;color:#f3e7ec}.location-row .location-clear:hover{background:#ffffff20}
