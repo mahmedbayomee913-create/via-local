@@ -42,17 +42,17 @@ export default function TravelHub({ lang='ar' }) {
     catch(e) { message(e.message || t('تعذر تحميل البيانات','Could not load catalog')); }
     finally { setLoadingCatalog(false); }
   }
-  async function loadCustomer() {
+  async function loadCustomer({preserveAuthenticatedUser=false} = {}) {
     setCustomerLoading(true);
     try {
       const r=await fetch('/api/customer/me',{credentials:'same-origin'});
-      if(!r.ok){setUser(null);setBookings([]);setVisits([]);setPoints(0);return false;}
+      if(!r.ok){if(!preserveAuthenticatedUser)setUser(null);setBookings([]);setVisits([]);setPoints(0);return false;}
       const d=await r.json();setUser(d.user);setProfile({full_name:d.profile?.full_name||'',phone:d.profile?.phone||''});
       const [br,pr]=await Promise.all([fetch('/api/customer/bookings',{credentials:'same-origin'}),fetch('/api/passport',{credentials:'same-origin'})]);
       if(br.ok){const bd=await br.json();setBookings(bd.bookings||[]);}
       if(pr.ok){const pd=await pr.json();setVisits(pd.visits||[]);setPoints(pd.points||0);}
       return true;
-    } catch { setUser(null);setBookings([]);setVisits([]);setPoints(0);return false; }
+    } catch { if(!preserveAuthenticatedUser)setUser(null);setBookings([]);setVisits([]);setPoints(0);return false; }
     finally {setCustomerLoading(false);}
   }
   useEffect(()=>{loadCatalog();loadCustomer();},[]);
@@ -95,7 +95,10 @@ export default function TravelHub({ lang='ar' }) {
         return;
       }
       setPendingConfirmationEmail('');
-      await loadCustomer();message(t('تم تسجيل الدخول بنجاح.','You are signed in.'));
+      if(d.user){setUser(d.user);setProfile(v=>({...v,full_name:d.user.user_metadata?.full_name||v.full_name}));}
+      const loaded=await loadCustomer({preserveAuthenticatedUser:!!d.user});
+      if(!loaded&&!d.user)throw new Error(t('تم تسجيل الدخول لكن تعذر تحميل جلسة الحساب. أعد المحاولة.','Signed in, but the account session could not be loaded. Please retry.'));
+      setTab('account');message(t('تم تسجيل الدخول بنجاح. جميع خدمات الحساب أصبحت متاحة.','Signed in successfully. Account services are now available.'));
     }catch(e){
       if (/email not confirmed/i.test(e.message || '')) {
         message(t('حسابك موجود، لكنه يحتاج تأكيد البريد الإلكتروني قبل تسجيل الدخول. أعد إرسال رسالة التأكيد من الزر أدناه.','Your account exists, but email confirmation is required before sign-in. Resend the confirmation email below.'));
@@ -179,7 +182,7 @@ export default function TravelHub({ lang='ar' }) {
     </div>}
 
     {tab==='account'&&<div className="hub-card"><div className="hub-card-title"><UserRound size={20}/><div><h2>{t('حساب المسافر','Traveller account')}</h2><p>{t('احفظ بياناتك وتابع طلباتك من حساب واحد.','Save your details and keep track of your requests.')}</p></div></div>
-      {user?<><div className="hub-signed"><CheckCircle2 size={18}/><strong>{user.email}</strong><button className="btn-outline" onClick={signOut}><LogOut size={15}/>{t('تسجيل الخروج','Sign out')}</button></div>
+      {customerLoading&&!user?<div className="hub-empty">{t('جارٍ التحقق من حسابك...','Checking your account session...')}</div>:user?<><div className="hub-signed"><CheckCircle2 size={18}/><strong>{user.email}</strong><button className="btn-outline" onClick={signOut}><LogOut size={15}/>{t('تسجيل الخروج','Sign out')}</button></div>
         <form className="hub-form" onSubmit={saveProfile}>{field(t('الاسم','Name'),<input value={profile.full_name} onChange={e=>setProfile({...profile,full_name:e.target.value})}/>)}{field(t('الهاتف','Phone'),<input value={profile.phone} onChange={e=>setProfile({...profile,phone:e.target.value})}/>)}<button className="btn-primary" disabled={busy}>{t('حفظ البيانات','Save profile')}</button></form>
         <h3 className="hub-subtitle">{t('حجوزاتي','My bookings')}</h3>{bookings.length?bookings.map(b=><article className="hub-list-row" key={b.id}><strong>{b.booking_code}</strong><span>{b.booking_date} · {b.guests} {t('أفراد','guests')}</span><b>{b.status}</b></article>):<p className="hub-muted">{t('لا توجد حجوزات مرتبطة بهذا الحساب بعد.','No bookings linked to this account yet.')}</p>}
       </>:<><div className="hub-switch"><button className={accountMode==='login'?'active':''} onClick={()=>setAccountMode('login')}>{t('تسجيل الدخول','Sign in')}</button><button className={accountMode==='signup'?'active':''} onClick={()=>setAccountMode('signup')}>{t('إنشاء حساب','Create account')}</button></div>
