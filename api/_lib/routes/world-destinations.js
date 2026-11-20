@@ -144,7 +144,7 @@ async function loadCuratedCatalog() {
         city_en: item.cityEn,
         country_ar: item.countryAr,
         country_en: item.countryEn,
-        category: item.categoryAr,
+        category: ({'أثري':'archaeological','تاريخي':'history','تراثي':'heritage','ثقافي':'culture','طبيعة':'nature','ساحلي':'coast','متحف':'museum'})[item.categoryAr] || 'culture',
         category_ar: item.categoryAr,
         category_en: item.categoryEn,
         description_ar: descriptionAr,
