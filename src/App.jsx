@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import Admin from './Admin.jsx';
+import TravelHub from './TravelHub.jsx';
 import {
   MapPin, Compass, Users, Accessibility, Search, Globe2, Menu, X,
   Star, Clock3, Heart, ArrowUpLeft, ChevronLeft, ShieldCheck,
@@ -56,11 +57,16 @@ const placeEN = {
 15:{name:'Tiwanaku',city:'Tiwanaku',category:'Archaeological',distance:'La Paz region · Bolivia',tags:['Pre-Inca','Monuments','Bolivia'],description:'A major pre-Hispanic ceremonial and political centre on the Andean Altiplano, known for monumental stone architecture.'},
 16:{name:'Sukhothai Historical Park',city:'Sukhothai',category:'Archaeological',distance:'Thailand',tags:['History','Buddhist monuments','Thailand'],description:'A historic park preserving temples, Buddhist images, and remains of the Sukhothai kingdom.'}
 };
-function localizedPlace(p,lang){return lang==='en'?{...p,...(placeEN[p.id]||{})}:p;}
+function localizedPlace(p,lang){
+  if (p.name_en || p.city_en) return lang==='en' ? {...p,name:p.name_en||p.name,city:p.city_en||p.city,category:p.category_en||p.category,distance:p.city_en||p.distance,description:p.description_en||p.description,tags:p.tags||[]} : {...p,name:p.name_ar||p.name,city:p.city_ar||p.city,distance:p.city_ar||p.distance,description:p.description_ar||p.description,tags:p.tags||[]};
+  return lang==='en'?{...p,...(placeEN[p.id]||{})}:p;
+}
 
 function Website() {
   const [lang, setLang] = useState(() => { try { return localStorage.getItem('via-local:lang') === 'en' ? 'en' : 'ar'; } catch { return 'ar'; } });
   const [tab, setTab] = useState('home');
+  const [liveCatalog, setLiveCatalog] = useState({ destinations: [], guides: [], experiences: [] });
+  useEffect(() => { fetch('/api/catalog').then(r => r.ok ? r.json() : null).then(d => { if (d) setLiveCatalog(d); }).catch(() => {}); }, []);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
   const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem('via-local:favorites') || '[]'); } catch { return []; } });
@@ -77,12 +83,24 @@ function Website() {
   useEffect(() => { try { localStorage.setItem('via-local:lang', lang); } catch {} }, [lang]);
   const t = copy[lang];
   const rtl = lang === 'ar';
+  const placeList = liveCatalog.destinations.length ? liveCatalog.destinations.map(d => ({
+    id:d.id, name_ar:d.name_ar, name_en:d.name_en, city_ar:d.city_ar, city_en:d.city_en,
+    country_ar:d.country_ar, country_en:d.country_en, name:d.name_ar, city:d.city_ar||d.city_en,
+    category:d.category, distance:d.city_ar||d.city_en, description_ar:d.description_ar, description_en:d.description_en,
+    image:d.image_url, tags:d.tags||[], family:d.family_friendly, nature:d.nature, accessible:d.accessible,
+    halal_options:d.halal_options, latitude:d.latitude, longitude:d.longitude
+  })) : places;
+  const guideList = liveCatalog.guides.length ? liveCatalog.guides.map(g => ({
+    id:g.id, name_ar:g.name_ar, name_en:g.name_en, name:g.name_ar, specialty:(g.specialties||[]).join(' · '),
+    languages:(g.languages||[]).join(' · '), price:g.price ? String(g.price)+' '+g.currency : (rtl?'تواصل لمعرفة السعر':'Contact for price'),
+    initials:(g.name_ar||'V').slice(0,2), isLive:true, verified:g.verified
+  })) : guides.map(g=>({...g,isLive:false}));
 
-  const filteredPlaces = useMemo(() => places.filter(p => {
+  const filteredPlaces = useMemo(() => placeList.filter(p => {
     const lp = localizedPlace(p, lang); const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')} ${lp.name} ${lp.city} ${lp.category} ${lp.tags.join(' ')}`.toLowerCase().includes(query.trim().toLowerCase());
     const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي','Archaeological','Historic','Heritage','Cultural'].includes(lp.category)) || (filter === 'accessible' && p.accessible) || (filter === 'favorites' && favorites.includes(p.id));
     return matchesQuery && matchesFilter;
-  }), [query, filter, lang, favorites]);
+  }), [placeList, query, filter, lang, favorites]);
 
   const notify = (message) => {
     setNotice(message);
@@ -127,7 +145,8 @@ function Website() {
 
   const navItems = [
     ['home', t.home, Compass], ['explore', t.discover, MapPin],
-    ['guides', t.localGuides, Users], ['access', t.inclusive, Accessibility]
+    ['guides', t.localGuides, Users], ['access', t.inclusive, Accessibility],
+    ['travel', rtl ? 'خدمات الرحلة' : 'Trip services', CalendarDays]
   ];
 
   return (
@@ -176,7 +195,7 @@ function Website() {
           </section>
           <section className="container section">
             <div className="section-heading"><div><span className="eyebrow gold-text">{t.featured}</span><h2>{t.exploreTitle}</h2></div><button className="text-link" onClick={() => navigate('explore')}>{t.details}<ChevronLeft size={17}/></button></div>
-            <PlaceGrid items={places.slice(8,11)} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} onSelect={setSelectedPlace}/>
+            <PlaceGrid items={placeList.slice(0,3)} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} onSelect={setSelectedPlace}/>
           </section>
         </>}
 
@@ -195,7 +214,7 @@ function Website() {
         {tab === 'guides' && <section className="container page-section">
           <div className="page-title"><span className="eyebrow gold-text">{t.guides}</span><h1>{t.guidesTitle}</h1><p>{t.guidesSub}</p></div>
           <div className="guide-intro"><div className="guide-intro-icon"><Headphones size={30}/></div><div><h3>{rtl ? 'تجربة محلية أقرب إليك' : 'A more local experience'}</h3><p>{rtl ? 'اختر نموذج المرشد واملأ طلب اهتمام بالجولة، وسيصل إلى فريق الإدارة.' : 'Choose a sample guide and send an inquiry for the admin team to review.'}</p></div></div>
-          <div className="guide-grid">{guides.map(g => <article className="guide-card" key={g.id}><div className="guide-top"><div className="avatar">{g.initials}</div><span className="rating">{t.demo}</span></div><h3>{rtl ? g.name : ['Sample local guide 01','Sample local guide 02','Sample local guide 03'][g.id-1]}</h3><p className="muted">{rtl ? g.specialty : ['Cultural city tours','Heritage walks and history','Nature and regional experiences'][g.id-1]}</p><div className="guide-language"><Languages size={16}/>{rtl ? g.languages : 'Arabic · English'}</div><div className="guide-bottom"><strong>{rtl ? g.price : 'Demo profile · No real service'}</strong><button className="btn-primary small" onClick={() => {setRequestGuide(g);setRequestResult('');setRequestForm({...requestForm,guide:g.name,destination:''});}}>{t.book}</button></div></article>)}</div>
+          <div className="guide-grid">{guideList.map(g => <article className="guide-card" key={g.id}><div className="guide-top"><div className="avatar">{g.initials}</div><span className="rating">{g.isLive ? (g.verified ? (rtl?'مرشد موثّق':'Verified guide') : (rtl?'ملف مرشد':'Guide profile')) : t.demo}</span></div><h3>{rtl ? (g.name_ar||g.name) : (g.name_en||g.name)}</h3><p className="muted">{g.specialty||''}</p><div className="guide-language"><Languages size={16}/>{g.languages||'—'}</div><div className="guide-bottom"><strong>{g.price||'—'}</strong><button className="btn-primary small" onClick={() => {setRequestGuide(g);setRequestResult('');setRequestForm({...requestForm,guide:g.name_ar||g.name,destination:''});}}>{t.book}</button></div></article>)}</div>
           <p className="disclaimer"><ShieldCheck size={16}/>{t.verifiedNote}</p>
         </section>}
 
@@ -207,6 +226,8 @@ function Website() {
           </div>
           <div className="access-note"><Accessibility size={22}/><div><strong>{rtl ? 'التصميم الشامل يتجاوز ميزة واحدة' : 'Accessibility is more than one feature'}</strong><p>{rtl ? 'النسخة القادمة ستضيف معلومات موثقة عن المنحدرات والمصاعد ودورات المياه المهيأة، ودعم تحويل الكلام إلى نص وأدوات تواصل إضافية.' : 'The next version can add verified ramp, elevator and restroom details, speech-to-text and more communication tools.'}</p></div></div>
         </section>}
+
+        {tab === 'travel' && <TravelHub lang={lang}/>}
       </main>
 
       <footer className="footer"><div className="container footer-inner"><div className="footer-brand"><span className="brand-mark"><MapPin size={20}/></span><div><strong>{rtl ? 'فيا لوكال' : 'VIA LOCAL'}</strong><small>{t.footer}</small></div></div><span className="footer-copy">© 2026 VIA LOCAL · {t.demo}</span></div></footer>
