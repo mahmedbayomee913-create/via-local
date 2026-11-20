@@ -73,9 +73,9 @@ function App() {
 
   const filteredPlaces = useMemo(() => places.filter(p => {
     const lp = localizedPlace(p, lang); const matchesQuery = `${p.name} ${p.city} ${p.category} ${p.tags.join(' ')} ${lp.name} ${lp.city} ${lp.category} ${lp.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'accessible' && p.accessible);
+    const matchesFilter = filter === 'all' || (filter === 'family' && p.family) || (filter === 'nature' && p.nature) || (filter === 'history' && ['أثري','تاريخي','تراثي'].includes(p.category));
     return matchesQuery && matchesFilter;
-  }), [query, filter]);
+  }), [query, filter, lang]);
 
   const notify = (message) => {
     setNotice(message);
@@ -108,10 +108,10 @@ function App() {
 
   return (
     <div className={rtl ? 'app' : 'app ltr'} dir={rtl ? 'rtl' : 'ltr'}>
-      <div className="announcement-bar"><Sparkles size={13}/><span>منصة فيا لوكال — سفر آمن وشامل، ومرشد محلي يفتح لك أبواب المكان</span><Sparkles size={13}/></div>
+      <div className="announcement-bar"><Sparkles size={13}/><span>{t.announcement}</span><Sparkles size={13}/></div>
       <header className="header">
         <div className="container header-inner">
-          <button className="brand" onClick={() => setTab('home')} aria-label="Via Local home">
+          <button className="brand" onClick={() => setTab('home')} aria-label={t.homeAria}>
             <span className="brand-mark"><MapPin size={25} strokeWidth={2.5}/></span>
             <span className="brand-name arabic-brand">فيا لوكال<small>VIA LOCAL</small></span>
           </button>
@@ -120,7 +120,7 @@ function App() {
           </nav>
           <div className="header-actions">
             <button className="language-btn" onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}><Globe2 size={17}/>{t.language}</button>
-            <button className="menu-btn" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Toggle menu">{mobileMenu ? <X/> : <Menu/>}</button>
+            <button className="menu-btn" onClick={() => setMobileMenu(!mobileMenu)} aria-label={t.menuAria}>{mobileMenu ? <X/> : <Menu/>}</button>
           </div>
         </div>
         {mobileMenu && <div className="mobile-nav">{navItems.map(([id, label, Icon]) => <button key={id} onClick={() => {setTab(id);setMobileMenu(false)}}><Icon size={18}/>{label}</button>)}</div>}
@@ -161,7 +161,7 @@ function App() {
           <div className="filter-panel">
             <div className="search-field"><Search size={19}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder={t.search}/></div>
             <div className="filter-chips">
-              {[['all',t.all],['family',t.family],['nature',t.nature],['accessible',t.accessible]].map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'chip selected' : 'chip'}>{label}</button>)}
+              {[['all',t.all],['family',t.family],['nature',t.nature],['history',t.history]].map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={filter === id ? 'chip selected' : 'chip'}>{label}</button>)}
             </div>
           </div>
           <div className="results-caption"><span><SlidersHorizontal size={16}/>{t.searchResults}</span><small>{filteredPlaces.length} {rtl ? 'أماكن' : 'places'}</small></div>
