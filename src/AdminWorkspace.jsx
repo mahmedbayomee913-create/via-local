@@ -182,7 +182,21 @@ export default function AdminWorkspace({ section, lang='ar' }) {
     {showManualBooking&&<form className="workspace-form" onSubmit={submitManualBooking}>
       <div className="workspace-form-head"><strong>{t('إضافة حجز يدوي','Create manual booking')}</strong><button type="button" onClick={()=>setShowManualBooking(false)}><X size={17}/></button></div>
       <div className="workspace-fields">
-        <label>{t('التجربة *','Experience *')}<select required value={manualBooking.experience_id} onChange={e=>setManualBooking({...manualBooking,experience_id:e.target.value})}><option value="">{t('اختر تجربة منشورة','Choose published experience')}</option>{experienceOptions.map(x=><option key={x.id} value={x.id}>{x.title_ar||x.title_en} · {money(x.price,x.currency)}</option>}</select></label>
+        <label>
+          {t('التجربة *','Experience *')}
+          <select
+            required
+            value={manualBooking.experience_id}
+            onChange={e => setManualBooking(prev => ({ ...prev, experience_id: e.target.value }))}
+          >
+            <option value="">{t('اختر تجربة منشورة','Choose published experience')}</option>
+            {experienceOptions.map(x => (
+              <option key={x.id} value={x.id}>
+                {x.title_ar || x.title_en} · {money(x.price, x.currency)}
+              </option>
+            ))}
+          </select>
+        </label>
         <label>{t('اسم العميل *','Customer name *')}<input required maxLength="100" value={manualBooking.customer_name} onChange={e=>setManualBooking({...manualBooking,customer_name:e.target.value})}/></label>
         <label>{t('رقم الهاتف *','Phone *')}<input required maxLength="40" type="tel" value={manualBooking.customer_phone} onChange={e=>setManualBooking({...manualBooking,customer_phone:e.target.value})}/></label>
         <label>{t('البريد الإلكتروني','Email')}<input type="email" maxLength="160" value={manualBooking.customer_email} onChange={e=>setManualBooking({...manualBooking,customer_email:e.target.value})}/></label>
