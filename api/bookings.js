@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const experience = rows?.[0];
     if (!experience) return res.status(404).json({ error: 'This experience is not currently available.' });
     if (guests > Number(experience.capacity)) return res.status(400).json({ error: 'The number of guests exceeds this experience capacity.' });
-    const user = await getCustomer(req);
+    const user = await getCustomer(req, res);
     const unit_price = Number(experience.price || 0);
     const payload = {
       customer_name, customer_phone, customer_email: customer_email || null,
