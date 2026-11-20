@@ -3,7 +3,7 @@ import { isAdmin } from '../auth.js';
 
 const fields = {
   destinations: ['slug','name_ar','name_en','city_ar','city_en','country_ar','country_en','category','description_ar','description_en','image_url','gallery','tags','family_friendly','nature','halal_options','accessible','accessibility_details','latitude','longitude','featured','published'],
-  guides: ['name_ar','name_en','bio_ar','bio_en','city_ar','city_en','country_ar','country_en','languages','specialties','price','currency','avatar_url','verified','published'],
+  guides: ['name_ar','name_en','bio_ar','bio_en','city_ar','city_en','country_ar','country_en','languages','specialties','price','currency','avatar_url','is_demo','verified','published'],
   experiences: ['slug','title_ar','title_en','description_ar','description_en','destination_id','guide_id','duration_minutes','price','currency','capacity','schedule','accessible_features','published'],
   content_pages: ['slug','title_ar','title_en','body_ar','body_en','published']
 };
@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       const body = req.body || {};
       const payload = Object.fromEntries(fields[type].filter(k => body[k] !== undefined).map(k => [k, body[k]]));
       if (!Object.keys(payload).length) return res.status(400).json({ error: 'No valid changes supplied.' });
+      if (type === 'guides' && payload.is_demo === true && payload.verified === true) return res.status(400).json({ error: 'Demo guide profiles cannot be verified.' });
       const updated = await db(`${type}?id=eq.${id}`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify(payload) });
       return res.status(200).json({ item: updated?.[0] || null });
     }
