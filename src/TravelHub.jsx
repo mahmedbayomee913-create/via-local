@@ -19,7 +19,7 @@ export default function TravelHub({ lang='ar' }) {
   const [loadingCatalog,setLoadingCatalog] = useState(true);
   const [notice,setNotice] = useState('');
   const [busy,setBusy] = useState(false);
-  const [planForm,setPlanForm] = useState({city:'',country:'',days:3,interests:'culture,nature'});
+  const [planForm,setPlanForm] = useState({city:'',country:'',days:3,budget:'',interests:'culture,nature'});
   const [plan,setPlan] = useState(null);
   const [booking,setBooking] = useState({experience_id:'',customer_name:'',customer_email:'',customer_phone:'',booking_date:'',guests:1,notes:''});
   const [account,setAccount] = useState({email:'',password:'',full_name:'',phone:''});
@@ -122,6 +122,7 @@ export default function TravelHub({ lang='ar' }) {
         {field(t('المدينة *','City *'),<input required value={planForm.city} onChange={e=>setPlanForm({...planForm,city:e.target.value})} placeholder={t('مثال: مسقط','e.g. Muscat')}/>)}
         {field(t('الدولة','Country'),<input value={planForm.country} onChange={e=>setPlanForm({...planForm,country:e.target.value})}/>)}
         {field(t('عدد الأيام','Number of days'),<input type="number" min="1" max="30" value={planForm.days} onChange={e=>setPlanForm({...planForm,days:e.target.value})}/>)}
+        {field(t('الميزانية التقريبية','Approximate budget'),<input type="number" min="0" value={planForm.budget} onChange={e=>setPlanForm({...planForm,budget:e.target.value})} placeholder="USD"/>)}
         {field(t('اهتماماتك (بفواصل)','Interests (comma separated)'),<input value={planForm.interests} onChange={e=>setPlanForm({...planForm,interests:e.target.value})} placeholder="culture, nature, food"/>,true)}
         <button className="btn-primary" disabled={busy}>{busy?t('جارٍ إعداد الخطة...','Planning...'):t('أنشئ برنامج رحلتي','Create my itinerary')} <Compass size={17}/></button>
       </form>
