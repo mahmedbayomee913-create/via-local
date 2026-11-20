@@ -12,11 +12,14 @@ export default async function handler(req, res) {
     const rows = await db(`guide_applications?id=eq.${id}`, { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify({ status }) });
     if (status === 'approved' && rows?.[0]) {
       const a = rows[0];
-      await db('guides', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
-        name_ar: a.applicant_name, name_en: a.applicant_name, bio_ar: a.bio, bio_en: a.bio,
-        city_ar: a.city, city_en: a.city, country_ar: a.country, country_en: a.country,
-        languages: a.languages || [], specialties: a.specialties || [], verified: true, published: false, price: 0, currency: 'USD'
-      })});
+      const existing = await db(`guides?select=id&name_ar=eq.${encodeURIComponent(a.applicant_name)}&city_ar=eq.${encodeURIComponent(a.city)}&limit=1`);
+      if (!existing?.length) {
+        await db('guides', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify({
+          name_ar: a.applicant_name, name_en: a.applicant_name, bio_ar: a.bio, bio_en: a.bio,
+          city_ar: a.city, city_en: a.city, country_ar: a.country, country_en: a.country,
+          languages: a.languages || [], specialties: a.specialties || [], verified: true, published: false, price: 0, currency: 'USD'
+        })});
+      }
     }
     return res.status(200).json({ application: rows?.[0] || null });
   } catch (e) {
