@@ -1,0 +1,177 @@
+import React, { useEffect, useState } from 'react';
+import { Plus, Pencil, Trash2, Save, X, RefreshCw, MapPin, Users, CalendarDays, Star, FileText, CheckCircle2, Clock3, ShieldCheck } from 'lucide-react';
+import './admin-workspace.css';
+
+const contentTypes = {
+  destinations: {
+    ar: 'الوجهات', en: 'Destinations',
+    fields: [
+      ['slug','الرابط المختصر','Slug','text',true],['name_ar','الاسم بالعربية','Arabic name','text',true],['name_en','الاسم بالإنجليزية','English name','text',true],
+      ['city_ar','المدينة بالعربية','Arabic city','text'],['city_en','المدينة بالإنجليزية','English city','text'],['country_ar','الدولة بالعربية','Arabic country','text'],['country_en','الدولة بالإنجليزية','English country','text'],
+      ['category','التصنيف','Category','text'],['description_ar','الوصف بالعربية','Arabic description','textarea'],['description_en','الوصف بالإنجليزية','English description','textarea'],
+      ['image_url','رابط الصورة','Image URL','text'],['tags','الكلمات المفتاحية (بفواصل)','Tags (comma separated)','array'],['gallery','معرض الصور JSON','Gallery JSON','json'],
+      ['family_friendly','مناسب للعائلات','Family friendly','boolean'],['nature','طبيعة','Nature','boolean'],['halal_options','خيارات حلال','Halal options','boolean'],['accessible','إمكانية الوصول','Accessibility','boolean'],
+      ['accessibility_details','تفاصيل الوصول JSON','Accessibility details JSON','json'],['latitude','خط العرض','Latitude','number'],['longitude','خط الطول','Longitude','number'],
+      ['featured','وجهة مميزة','Featured','boolean'],['published','منشور على الموقع','Published on site','boolean']
+    ]
+  },
+  guides: {
+    ar: 'المرشدون', en: 'Guides',
+    fields: [
+      ['name_ar','الاسم بالعربية','Arabic name','text',true],['name_en','الاسم بالإنجليزية','English name','text',true],['bio_ar','نبذة بالعربية','Arabic bio','textarea'],['bio_en','نبذة بالإنجليزية','English bio','textarea'],
+      ['city_ar','المدينة بالعربية','Arabic city','text'],['city_en','المدينة بالإنجليزية','English city','text'],['country_ar','الدولة بالعربية','Arabic country','text'],['country_en','الدولة بالإنجليزية','English country','text'],
+      ['languages','اللغات (بفواصل)','Languages (comma separated)','array'],['specialties','التخصصات (بفواصل)','Specialties (comma separated)','array'],['price','السعر','Price','number'],['currency','العملة','Currency','text'],['avatar_url','رابط الصورة الشخصية','Avatar URL','text'],['verified','مرشد موثّق','Verified','boolean'],['published','منشور على الموقع','Published on site','boolean']
+    ]
+  },
+  experiences: {
+    ar: 'التجارب والجولات', en: 'Experiences',
+    fields: [
+      ['slug','الرابط المختصر','Slug','text',true],['title_ar','اسم التجربة بالعربية','Arabic title','text',true],['title_en','اسم التجربة بالإنجليزية','English title','text',true],
+      ['description_ar','الوصف بالعربية','Arabic description','textarea'],['description_en','الوصف بالإنجليزية','English description','textarea'],['destination_id','معرّف الوجهة','Destination ID','text'],['guide_id','معرّف المرشد','Guide ID','text'],
+      ['duration_minutes','المدة بالدقائق','Duration in minutes','number'],['price','السعر للفرد','Price per guest','number'],['currency','العملة','Currency','text'],['capacity','السعة القصوى','Capacity','number'],
+      ['schedule','المواعيد JSON','Schedule JSON','json'],['accessible_features','مميزات الوصول JSON','Accessibility JSON','json'],['published','متاحة للحجز','Published / bookable','boolean']
+    ]
+  },
+  content_pages: {
+    ar: 'صفحات ومحتوى الموقع', en: 'CMS Pages',
+    fields: [['slug','الرابط المختصر','Slug','text',true],['title_ar','العنوان بالعربية','Arabic title','text',true],['title_en','العنوان بالإنجليزية','English title','text',true],['body_ar','المحتوى بالعربية','Arabic body','textarea'],['body_en','المحتوى بالإنجليزية','English body','textarea'],['published','منشور','Published','boolean']]
+  }
+};
+
+const bookingStatuses = ['pending','accepted','confirmed','cancelled','completed','rejected'];
+const applicationStatuses = ['pending','reviewing','approved','rejected'];
+const statusAr = {pending:'قيد الانتظار',accepted:'مقبول',confirmed:'مؤكد',cancelled:'ملغي',completed:'مكتمل',rejected:'مرفوض',reviewing:'قيد المراجعة',approved:'تمت الموافقة'};
+const statusEn = {pending:'Pending',accepted:'Accepted',confirmed:'Confirmed',cancelled:'Cancelled',completed:'Completed',rejected:'Rejected',reviewing:'Reviewing',approved:'Approved'};
+const money = (v,c='USD') => new Intl.NumberFormat('en',{style:'currency',currency:c,maximumFractionDigits:2}).format(Number(v||0));
+const blankFor = fields => Object.fromEntries(fields.map(([key,,,,required]) => [key, key==='published'||key==='verified'||key==='featured'||key==='family_friendly'||key==='nature'||key==='halal_options'||key==='accessible' ? false : key==='price'?0:key==='capacity'?10:key==='duration_minutes'?120:key==='currency'?'USD':'']));
+
+export default function AdminWorkspace({ section, lang='ar' }) {
+  const rtl = lang === 'ar';
+  const [type,setType] = useState('destinations');
+  const [items,setItems] = useState([]);
+  const [rows,setRows] = useState([]);
+  const [loading,setLoading] = useState(false);
+  const [error,setError] = useState('');
+  const [editing,setEditing] = useState(null);
+  const [form,setForm] = useState({});
+  const [saving,setSaving] = useState(false);
+  const [search,setSearch] = useState('');
+  const t = (ar,en) => rtl ? ar : en;
+
+  async function load() {
+    setLoading(true); setError('');
+    try {
+      let url = '';
+      if (section === 'content') url = `/api/admin/content?type=${type}`;
+      if (section === 'bookings') url = '/api/admin/bookings';
+      if (section === 'reviews') url = '/api/admin/reviews';
+      if (section === 'applications') url = '/api/admin/guide-applications';
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not load data.');
+      setItems(data.items || data.bookings || data.reviews || data.applications || []);
+    } catch (e) { setError(e.message || 'Could not load data.'); }
+    finally { setLoading(false); }
+  }
+
+  useEffect(() => { setEditing(null); setForm({}); setSearch(''); load(); }, [section,type]);
+
+  const beginNew = () => { setEditing('new'); setForm(blankFor(contentTypes[type].fields)); };
+  const beginEdit = row => {
+    const next = {};
+    contentTypes[type].fields.forEach(([key,, ,kind]) => {
+      const value = row[key];
+      next[key] = kind === 'array' ? (Array.isArray(value) ? value.join(', ') : '') : kind === 'json' ? JSON.stringify(value ?? (key==='gallery' ? [] : {}), null, 2) : (value ?? '');
+    });
+    setEditing(row.id); setForm(next);
+  };
+  const saveContent = async e => {
+    e.preventDefault(); setSaving(true); setError('');
+    try {
+      const payload = {};
+      for (const [key,, ,kind,required] of contentTypes[type].fields) {
+        let value = form[key];
+        if (required && !String(value ?? '').trim()) throw new Error(t('أكمل الحقول المطلوبة أولًا.','Complete the required fields first.'));
+        if (kind === 'array') value = String(value || '').split(',').map(x=>x.trim()).filter(Boolean);
+        if (kind === 'number') value = value === '' ? null : Number(value);
+        if (kind === 'json') { try { value = value ? JSON.parse(value) : (key==='gallery' ? [] : {}); } catch { throw new Error(t('صيغة JSON غير صحيحة في أحد الحقول.','One of the JSON fields is invalid.')); } }
+        if (kind === 'boolean') value = Boolean(value);
+        payload[key] = value;
+      }
+      const endpoint = editing === 'new' ? `/api/admin/content?type=${type}` : `/api/admin/content/${editing}?type=${type}`;
+      const response = await fetch(endpoint,{method:editing==='new'?'POST':'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Save failed.');
+      setEditing(null); setForm({}); await load();
+    } catch (e) { setError(e.message || 'Save failed.'); }
+    finally { setSaving(false); }
+  };
+
+  async function deleteContent(id) {
+    if (!window.confirm(t('متأكد من حذف العنصر؟','Delete this item?'))) return;
+    try {
+      const r = await fetch(`/api/admin/content/${id}?type=${type}`,{method:'DELETE'});
+      const d = await r.json(); if(!r.ok) throw new Error(d.error || 'Delete failed.');
+      await load();
+    } catch(e) { setError(e.message || 'Delete failed.'); }
+  }
+
+  async function patchStatus(kind,row,value) {
+    const endpoint = kind==='bookings' ? `/api/admin/bookings/${row.id}` : kind==='applications' ? `/api/admin/guide-applications/${row.id}` : `/api/admin/reviews/${row.id}`;
+    const body = kind==='reviews' ? {approved:value} : {status:value};
+    try {
+      const r=await fetch(endpoint,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const d=await r.json(); if(!r.ok) throw new Error(d.error || 'Update failed.');
+      await load();
+    } catch(e) { setError(e.message || 'Update failed.'); }
+  }
+
+  const filtered = items.filter(row => JSON.stringify(row).toLowerCase().includes(search.toLowerCase()));
+  const title = section==='content'?t('إدارة المحتوى','Content management'):section==='bookings'?t('الحجوزات','Bookings'):section==='reviews'?t('مراجعة التقييمات','Review moderation'):t('طلبات انضمام المرشدين','Guide applications');
+
+  if (section === 'content') {
+    const fields = contentTypes[type].fields;
+    return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
+      <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL CMS</span><h2>{title}</h2><p>{t('أضف الوجهات والمرشدين والتجارب والمحتوى، ثم انشرها للموقع.','Create destinations, guides, experiences and pages, then publish them.')}</p></div><button className="workspace-primary" onClick={beginNew}><Plus size={16}/>{t('إضافة جديد','Add new')}</button></div>
+      <div className="workspace-toolbar"><select value={type} onChange={e=>setType(e.target.value)}>{Object.entries(contentTypes).map(([key,v])=><option key={key} value={key}>{rtl?v.ar:v.en}</option>)}</select><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={t('ابحث في المحتوى...','Search content...')}/><button onClick={load} disabled={loading}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div>
+      {error&&<div className="workspace-error">{error}</div>}
+      {editing!==null && <form className="workspace-form" onSubmit={saveContent}>
+        <div className="workspace-form-head"><strong>{editing==='new'?t('إضافة عنصر جديد','Create item'):t('تعديل العنصر','Edit item')}</strong><button type="button" onClick={()=>setEditing(null)}><X size={17}/></button></div>
+        <div className="workspace-fields">{fields.map(([key,labelAr,labelEn,kind,required])=><label key={key} className={kind==='textarea'||kind==='json'?'wide':''}>{rtl?labelAr:labelEn}{required?' *':''}
+          {kind==='textarea'||kind==='json'?<textarea rows={kind==='json'?3:2} value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})} placeholder={kind==='json'?'{}':''}/>:kind==='boolean'?<input type="checkbox" checked={!!form[key]} onChange={e=>setForm({...form,[key]:e.target.checked})}/>:<input type={kind==='number'?'number':'text'} step={kind==='number'?'any':undefined} value={form[key]??''} onChange={e=>setForm({...form,[key]:e.target.value})}/>}
+        </label>)}</div>
+        <div className="workspace-form-actions"><button type="button" className="workspace-quiet" onClick={()=>setEditing(null)}>{t('إلغاء','Cancel')}</button><button className="workspace-primary" disabled={saving}><Save size={16}/>{saving?t('جارٍ الحفظ...','Saving...'):t('حفظ','Save')}</button></div>
+      </form>}
+      <div className="workspace-list">
+        {loading?<div className="workspace-empty"><RefreshCw className="spin"/> {t('جارٍ تحميل المحتوى...','Loading content...')}</div>:filtered.map(row=><article className="workspace-item" key={row.id}>
+          <div className="workspace-item-main"><strong>{row.name_ar||row.title_ar||row.title_en||row.name_en||row.slug||row.id}</strong><small>{row.city_ar||row.city_en||row.category||row.specialties?.join(' · ')||row.slug||row.id}</small></div>
+          <span className={'workspace-badge '+(row.published?'published':'draft')}>{row.published?t('منشور','Published'):t('مسودة','Draft')}</span>
+          <button className="workspace-icon-btn" onClick={()=>beginEdit(row)} title={t('تعديل','Edit')}><Pencil size={16}/></button>
+          <button className="workspace-icon-btn danger" onClick={()=>deleteContent(row.id)} title={t('حذف','Delete')}><Trash2 size={16}/></button>
+        </article>)}
+        {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد عناصر بعد. أضف أول عنصر من الأعلى.','No items yet. Add your first item above.')}</div>}
+      </div>
+    </section>;
+  }
+
+  if (section === 'bookings') return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
+    <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL OPERATIONS</span><h2>{title}</h2><p>{t('راجع طلبات الحجز وغيّر حالتها من مكان واحد.','Review booking requests and update their status.')}</p></div><button className="workspace-quiet" onClick={load}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div>
+    {error&&<div className="workspace-error">{error}</div>}
+    <div className="workspace-list">{loading?<div className="workspace-empty">{t('جارٍ التحميل...','Loading...')}</div>:filtered.map(b=><article className="workspace-row" key={b.id}><div className="workspace-item-main"><strong>{b.customer_name} · {b.booking_code}</strong><small>{b.customer_phone} · {b.booking_date} · {b.guests} {t('أفراد','guests')}</small><small>{b.customer_email||'—'} · {money(b.total_amount,b.currency)}</small></div><select value={b.status} onChange={e=>patchStatus('bookings',b,e.target.value)}>{bookingStatuses.map(s=><option key={s} value={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select></article>)}
+    {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد حجوزات حتى الآن.','No bookings yet.')}</div>}</div>
+  </section>;
+
+  if (section === 'reviews') return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
+    <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL COMMUNITY</span><h2>{title}</h2><p>{t('كل تقييم يظل مخفيًا عن الزوار حتى توافق عليه.','Reviews stay hidden from visitors until approved.')}</p></div><button className="workspace-quiet" onClick={load}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div>
+    {error&&<div className="workspace-error">{error}</div>}
+    <div className="workspace-list">{loading?<div className="workspace-empty">{t('جارٍ التحميل...','Loading...')}</div>:filtered.map(r=><article className="workspace-review" key={r.id}><div className="workspace-review-top"><strong>{r.author_name}</strong><span><Star size={14} fill="currentColor"/> {r.rating}/5</span><span className={'workspace-badge '+(r.approved?'published':'draft')}>{r.approved?t('منشور','Approved'):t('بانتظار المراجعة','Pending')}</span></div><p>{r.comment}</p><button className="workspace-primary" onClick={()=>patchStatus('reviews',r,!r.approved)}>{r.approved?t('إخفاء التقييم','Unpublish review'):t('الموافقة والنشر','Approve & publish')}</button></article>)}
+    {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد تقييمات حتى الآن.','No reviews yet.')}</div>}</div>
+  </section>;
+
+  return <section className="workspace-panel" dir={rtl?'rtl':'ltr'}>
+    <div className="workspace-heading"><div><span className="workspace-kicker">VIA LOCAL PARTNERS</span><h2>{title}</h2><p>{t('راجع طلبات المرشدين ووافق على المناسب منها لإضافته إلى دليل المرشدين كمسودة.','Review guide applications and approve suitable candidates to create an unpublished guide profile.')}</p></div><button className="workspace-quiet" onClick={load}><RefreshCw size={15}/>{t('تحديث','Refresh')}</button></div>
+    {error&&<div className="workspace-error">{error}</div>}
+    <div className="workspace-list">{loading?<div className="workspace-empty">{t('جارٍ التحميل...','Loading...')}</div>:filtered.map(a=><article className="workspace-row" key={a.id}><div className="workspace-item-main"><strong>{a.applicant_name}</strong><small>{a.city}, {a.country||''} · {a.email} · {a.phone}</small><small>{(a.languages||[]).join(' · ')} | {(a.specialties||[]).join(' · ')}</small><small>{a.bio||''}</small></div><select value={a.status} onChange={e=>patchStatus('applications',a,e.target.value)}>{applicationStatuses.map(s=><option value={s} key={s}>{rtl?statusAr[s]:statusEn[s]}</option>)}</select></article>)}
+    {!loading&&!filtered.length&&<div className="workspace-empty">{t('لا توجد طلبات انضمام.','No guide applications yet.')}</div>}</div>
+  </section>;
+}
