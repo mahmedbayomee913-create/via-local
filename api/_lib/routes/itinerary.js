@@ -7,7 +7,8 @@ export default async function handler(req, res) {
     const body = req.body || {};
     const city = clean(body.city, 100);
     const country = clean(body.country, 100);
-    const days = Math.max(1, Math.min(30, Number(body.days) || 1));
+    const days = Number(body.days || 1);
+    if (!Number.isInteger(days) || days < 1 || days > 30) return res.status(400).json({ error: 'Trip duration must be a whole number between 1 and 30 days.' });
     const currency = clean(body.currency, 8) || 'USD';
     const budget = body.budget === '' || body.budget === null || body.budget === undefined ? null : Number(body.budget);
     if (budget !== null && (!Number.isFinite(budget) || budget < 0)) return res.status(400).json({ error: 'Enter a valid trip budget.' });
