@@ -6,7 +6,7 @@ import {
   Star, Clock3, Heart, ArrowUpLeft, ChevronLeft, ShieldCheck,
   Languages, Volume2, MessageCircle, CalendarDays, LocateFixed,
   SlidersHorizontal, Sparkles, CheckCircle2, Footprints, Baby,
-  Utensils, Map, Headphones
+  Utensils, Map, Headphones, FileText
 } from 'lucide-react';
 
 const places = [
@@ -80,7 +80,7 @@ function distanceKm(place,origin){
 function Website() {
   const [lang, setLang] = useState(() => { try { return localStorage.getItem('via-local:lang') === 'en' ? 'en' : 'ar'; } catch { return 'ar'; } });
   const [tab, setTab] = useState('home');
-  const [liveCatalog, setLiveCatalog] = useState({ destinations: [], guides: [], experiences: [], reviews: [], ratings: {} });
+  const [liveCatalog, setLiveCatalog] = useState({ destinations: [], guides: [], experiences: [], reviews: [], pages: [], ratings: {} });
   const [worldPlaces, setWorldPlaces] = useState([]);
   const [worldOffset, setWorldOffset] = useState(0);
   const [worldLoading, setWorldLoading] = useState(false);
@@ -241,8 +241,10 @@ function Website() {
   const navItems = [
     ['home', t.home, Compass], ['explore', t.discover, MapPin],
     ['guides', t.localGuides, Users], ['access', t.inclusive, Accessibility],
-    ['travel', rtl ? 'خدمات الرحلة' : 'Trip services', CalendarDays]
+    ['travel', rtl ? 'خدمات الرحلة' : 'Trip services', CalendarDays],
+    ...(liveCatalog.pages || []).filter(page => page.published).map(page => [`page:${page.slug}`, (rtl ? page.title_ar : page.title_en) || page.slug, FileText])
   ];
+  const activeCmsPage = (liveCatalog.pages || []).find(page => tab === `page:${page.slug}`);
 
   return (
     <div className={rtl ? 'app' : 'app ltr'} dir={rtl ? 'rtl' : 'ltr'}>
@@ -330,6 +332,7 @@ function Website() {
         </section>}
 
         {tab === 'travel' && <TravelHub lang={lang}/>}
+        {activeCmsPage && <section className="container page-section cms-page"><div className="page-title"><span className="eyebrow gold-text">VIA LOCAL</span><h1>{(rtl ? activeCmsPage.title_ar : activeCmsPage.title_en) || activeCmsPage.slug}</h1></div><div className="cms-page-body">{(rtl ? activeCmsPage.body_ar : activeCmsPage.body_en) || ''}</div></section>}
       </main>
 
       <footer className="footer"><div className="container footer-inner"><div className="footer-brand"><span className="brand-mark"><MapPin size={20}/></span><div><strong>{rtl ? 'فيا لوكال' : 'VIA LOCAL'}</strong><small>{t.footer}</small></div></div><span className="footer-copy">© 2026 VIA LOCAL</span></div></footer>
