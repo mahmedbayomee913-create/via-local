@@ -171,7 +171,16 @@ function Website() {
 
   const confirmLocation = () => {
     setLocationDialogOpen(false);
-    if (!navigator.geolocation) return notify(rtl?'المتصفح لا يدعم تحديد الموقع.':'Geolocation is not supported by this browser.');
+    if (!window.isSecureContext) {
+      const message = rtl ? 'ميزة الموقع تحتاج فتح الموقع عبر اتصال آمن (https). افتح https://via-local.vercel.app ثم أعد المحاولة.' : 'Location access requires a secure connection (https). Open https://via-local.vercel.app and try again.';
+      setLocationText(message);
+      return notify(rtl ? 'افتح الموقع من الرابط الآمن https ثم أعد المحاولة.' : 'Open the secure https site and try again.');
+    }
+    if (!navigator.geolocation) {
+      const message = rtl ? 'المتصفح الحالي لا يدعم تحديد الموقع. جرّب فتح الموقع في Chrome.' : 'This browser does not support location. Try opening the site in Chrome.';
+      setLocationText(message);
+      return notify(message);
+    }
     setLocationLoading(true);
     navigator.geolocation.getCurrentPosition(
       ({coords}) => {
@@ -181,13 +190,17 @@ function Website() {
       },
       error => {
         setLocationLoading(false);
-        notify(error?.code===1
-          ? (rtl?'لم تمنح إذن الموقع. يمكنك استخدام الموقع بدون تفعيله.':'Location permission was not granted. You can use the site without it.')
+        const message = error?.code===1
+          ? (rtl
+            ? 'إذن الموقع مرفوض من المتصفح. من إعدادات الموقع بجوار عنوان الصفحة افتح «الأذونات» ثم «الموقع» واختر «سماح»، وتأكد أن خدمة الموقع مفعّلة على الهاتف، ثم اضغط «رتّب حسب موقعي» مرة أخرى.'
+            : 'Location is blocked by your browser. Open the site settings beside the address bar, choose Permissions > Location > Allow, make sure phone location is on, then try again.')
           : error?.code===3
-            ? (rtl?'انتهت مهلة تحديد الموقع. حاول مرة أخرى أو تابع بدون الموقع.':'Location request timed out. Try again or continue without it.')
-            : (rtl?'تعذر تحديد موقعك الآن؛ يمكنك الاستكشاف دون الموقع.':'Could not determine your location. You can continue without it.'));
+            ? (rtl?'انتهت مهلة تحديد الموقع. تأكد من تشغيل خدمة الموقع وحاول مرة أخرى.':'The location request timed out. Turn on device location and try again.')
+            : (rtl?'تعذر تحديد الموقع حاليًا. تأكد من تشغيل خدمة الموقع على الهاتف ثم أعد المحاولة.':'Could not determine your location. Turn on device location and try again.');
+        setLocationText(message);
+        notify(error?.code===1 ? (rtl?'إذن الموقع مرفوض من إعدادات المتصفح. اتبع التعليمات الظاهرة بجوار زر الموقع.':'Location is blocked in browser settings. Follow the instructions beside the location button.') : message);
       },
-      {enableHighAccuracy:false,timeout:12000,maximumAge:60000}
+      {enableHighAccuracy:false,timeout:15000,maximumAge:60000}
     );
   };
   const clearLocation = () => { setUserCoords(null); setLocationText(''); notify(rtl?'تم إيقاف ترتيب الأماكن حسب موقعك.':'Nearby sorting has been turned off.'); };
@@ -298,7 +311,7 @@ function Website() {
         {tab === 'guides' && <section className="container page-section">
           <div className="page-title"><span className="eyebrow gold-text">{t.guides}</span><h1>{t.guidesTitle}</h1><p>{t.guidesSub}</p></div>
           <div className="guide-intro"><div className="guide-intro-icon"><Headphones size={30}/></div><div><h3>{rtl ? 'تجربة محلية أقرب إليك' : 'A more local experience'}</h3><p>{rtl ? 'الـ12 ملفًا الظاهرون الآن تجريبيون بأسماء وبيانات افتراضية، وليسوا مرشدين حقيقيين. طلب الجولة هنا للتجربة فقط.' : 'The 12 profiles currently shown are fictional demo profiles, not real guides. Tour inquiries here are for testing only.'}</p></div></div>
-          {guideList.length ? <div className="guide-grid">{guideList.map(g => <article className="guide-card" key={g.id}><div className="guide-top"><div className="avatar">{g.initials}</div><div className="guide-badges">{g.isDemo&&<span className="demo-chip">{rtl?'ملف تجريبي':'Demo profile'}</span>}<span className="rating">{g.verified ? (rtl?'مرشد موثّق':'Verified guide') : (rtl?'ملف مرشد':'Guide profile')}</span></div></div><h3>{rtl ? (g.name_ar||g.name) : (g.name_en||g.name)}</h3><p className="muted">{g.location ? `${g.location} · ` : ''}{g.specialty||''}</p><div className="guide-language"><Languages size={16}/>{g.languages||'—'}</div><div className="guide-bottom"><strong>{g.price||'—'}</strong><button className="btn-primary small" onClick={() => {setRequestGuide(g);setRequestResult('');setRequestForm({...requestForm,guide:g.name_ar||g.name,destination:''});}}>{g.isDemo ? (rtl?'جرّب طلب جولة':'Try demo inquiry') : t.book}</button></div></article>)}</div> : <div className="empty-state"><Users size={30}/><p>{rtl?'لا يوجد مرشدون منشورون حاليًا. يمكنك تقديم طلب للانضمام إلى شبكة المرشدين.':'No guides are currently published. You can apply to join the guide network.'}</p></div>}
+          {guideList.length ? <div className="guide-grid">{guideList.map(g => <article className="guide-card" key={g.id}><div className="guide-top"><div className="avatar">{g.initials}</div><div className="guide-badges"><span className="rating">{g.verified ? (rtl?'مرشد موثّق':'Verified guide') : (rtl?'ملف مرشد':'Guide profile')}</span></div></div><h3>{rtl ? (g.name_ar||g.name) : (g.name_en||g.name)}</h3><p className="muted">{g.location ? `${g.location} · ` : ''}{g.specialty||''}</p><div className="guide-language"><Languages size={16}/>{g.languages||'—'}</div><div className="guide-bottom"><strong>{g.price||'—'}</strong><button className="btn-primary small" onClick={() => {setRequestGuide(g);setRequestResult('');setRequestForm({...requestForm,guide:g.name_ar||g.name,destination:''});}}>t.book</button></div></article>)}</div> : <div className="empty-state"><Users size={30}/><p>{rtl?'لا يوجد مرشدون منشورون حاليًا. يمكنك تقديم طلب للانضمام إلى شبكة المرشدين.':'No guides are currently published. You can apply to join the guide network.'}</p></div>}
           <p className="disclaimer"><ShieldCheck size={16}/>{t.verifiedNote}</p>
         </section>}
 
@@ -327,6 +340,7 @@ function Website() {
             <li>{rtl?'اختياري تمامًا، ويمكنك الاستكشاف بدونه.':'Completely optional; you can explore without it.'}</li>
             <li>{rtl?'سيطلب المتصفح إذن الوصول بعد الضغط على متابعة.':'Your browser will ask for permission after you continue.'}</li>
             <li>{rtl?'يمكنك إيقاف ترتيب الأقرب في أي وقت.':'You can turn off nearby sorting at any time.'}</li>
+            <li>{rtl?'إذا رفض المتصفح الإذن، فعّله من إعدادات الموقع بجوار عنوان الصفحة ثم أعد المحاولة.':'If the browser blocks access, allow Location in this site’s settings beside the address bar, then try again.'}</li>
           </ul>
           <div className="location-consent-actions">
             <button className="btn-primary" onClick={confirmLocation}>{rtl?'متابعة وطلب الإذن':'Continue and request permission'}</button>
