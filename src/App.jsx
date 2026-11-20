@@ -78,8 +78,8 @@ function Website() {
       const data = await response.json();
       const items = Array.isArray(data.items) ? data.items : [];
       setWorldPlaces(previous => [...previous, ...items.filter(item => !previous.some(p => p.id === item.id))]);
-      setWorldOffset(worldOffset + items.length);
-      setWorldHasMore(Boolean(data.hasMore) && items.length > 0 && worldOffset + items.length < 2000);
+      setWorldOffset(Number(data.nextOffset ?? (worldOffset + 80)));
+      setWorldHasMore(Boolean(data.hasMore) && Number(data.nextOffset ?? (worldOffset + 80)) < 3000);
     } catch { setWorldError(lang === 'ar' ? 'تعذّر تحميل الوجهات العالمية الآن. حاول مرة أخرى.' : 'World destinations could not load. Try again.'); }
     finally { setWorldLoading(false); }
   };
@@ -230,7 +230,7 @@ function Website() {
           <div className="results-caption"><span><SlidersHorizontal size={16}/>{t.searchResults}</span><small>{filteredPlaces.length} {rtl ? 'أماكن' : 'places'}</small></div>
           {filteredPlaces.length ? <PlaceGrid items={filteredPlaces} t={t} lang={lang} favorites={favorites} toggleFavorite={toggleFavorite} notify={notify} onSelect={setSelectedPlace}/> : <div className="empty-state"><Search size={30}/><p>{t.noResults}</p><button className="btn-outline" onClick={() => {setQuery('');setFilter('all');notify(rtl ? 'تم مسح البحث والفلاتر.' : 'Search and filters cleared.')}}>{t.clearFilters}</button></div>}
           {worldError && <p className="disclaimer">{worldError}</p>}
-          {worldHasMore && <div className="load-more-wrap"><button className="btn-outline" disabled={worldLoading} onClick={loadWorldPlaces}>{worldLoading ? (rtl?'جارٍ تحميل الوجهات…':'Loading destinations…') : (rtl?'تحميل المزيد من وجهات العالم':'Load more destinations')}</button><small>{rtl?'يمكن استكشاف ما يصل إلى 2000 وجهة عالمية مع الصور.':'Explore up to 2,000 worldwide destinations with photos.'}</small></div>}
+          {worldHasMore && <div className="load-more-wrap"><button className="btn-outline" disabled={worldLoading} onClick={loadWorldPlaces}>{worldLoading ? (rtl?'جارٍ تحميل الوجهات…':'Loading destinations…') : (rtl?'تحميل المزيد من وجهات العالم':'Load more destinations')}</button><small>{rtl?'استكشف آلاف الوجهات العالمية بصورها.':'Explore thousands of worldwide destinations with photos.'}</small></div>}
         </section>}
 
         {tab === 'guides' && <section className="container page-section">
