@@ -151,13 +151,25 @@ export default function TravelHub({ lang='ar' }) {
     finally{setBusy(false);}
   }
 
+  function handleTab(id){
+    if(id==='passport'&&!user&&!customerLoading){
+      setReturnTab('passport');
+      setAccountMode('signup');
+      setTab('account');
+      message(t('أنشئ حسابك أو سجّل الدخول، وسيُفتح جوازك الرقمي تلقائيًا بعد نجاح الدخول.','Create an account or sign in; your digital passport will open automatically afterward.'));
+      return;
+    }
+    setTab(id);
+    if(id==='passport'&&!user)loadCustomer();
+  }
+
   const field=(label,element,wide=false)=><label className={wide?'hub-field wide':'hub-field'}>{label}{element}</label>;
   const experienceName = x => rtl ? x.title_ar : x.title_en;
   const placeName = x => rtl ? x.name_ar : x.name_en;
 
   return <section className="travel-hub container" dir={rtl?'rtl':'ltr'}>
     <div className="hub-intro"><div><span className="eyebrow gold-text">VIA LOCAL TRAVEL HUB</span><h1>{t('رحلتك تبدأ من هنا','Your journey starts here')}</h1><p>{t('خطط، احجز، تابع رحلاتك، واجمع ذكرياتك في حساب واحد.','Plan, book, track your trips and collect your memories in one place.')}</p></div><div className="hub-intro-mark"><PlaneTakeoff size={30}/></div></div>
-    <nav className="hub-tabs">{tabs.map(([id,ar,en,Icon])=><button key={id} className={tab===id?'active':''} onClick={()=>{if(id==='passport'&&!user&&!customerLoading){setReturnTab('passport');setAccountMode('signup');setTab('account');message(t('أنشئ حسابك أو سجّل الدخول، وسيُفتح جوازك الرقمي تلقائيًا بعد نجاح الدخول.','Create an account or sign in; your digital passport will open automatically afterward.'));return;}setTab(id);if(id==='passport'&&!user)loadCustomer();}}><Icon size={16}/>{t(ar,en)}</button>)</nav>
+    <nav className="hub-tabs">{tabs.map(([id,ar,en,Icon])=><button key={id} className={tab===id?'active':''} onClick={()=>handleTab(id)}><Icon size={16}/>{t(ar,en)}</button>)}</nav>
     {notice&&<div className="hub-notice"><CheckCircle2 size={17}/>{notice}</div>}
 
     {tab==='planner'&&<div className="hub-card"><div className="hub-card-title"><Compass size={20}/><div><h2>{t('مخطط الرحلات الذكي','Smart trip planner')}</h2><p>{t('أنشئ برنامجًا أوليًا حسب المدينة والمدة واهتماماتك، باستخدام الوجهات المنشورة في الموقع.','Build a starter itinerary using published destinations, your city, trip length and interests.')}</p></div></div>
