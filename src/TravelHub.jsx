@@ -15,6 +15,8 @@ export default function TravelHub({ lang='ar' }) {
   const rtl = lang === 'ar';
   const t = (ar,en) => rtl ? ar : en;
   const [tab,setTab] = useState('planner');
+  // Keep the protected destination the visitor originally requested until authentication completes.
+  const [returnTab,setReturnTab] = useState('account');
   const [catalog,setCatalog] = useState({destinations:[],guides:[],experiences:[]});
   const [loadingCatalog,setLoadingCatalog] = useState(true);
   const [notice,setNotice] = useState('');
@@ -91,14 +93,18 @@ export default function TravelHub({ lang='ar' }) {
       }
       if(d.confirmationRequired){
         setPendingConfirmationEmail(email);
-        message(t('تم إنشاء الحساب. افتح رسالة التأكيد المرسلة إلى بريدك، ثم ارجع وسجّل الدخول. راجع مجلد البريد غير المرغوب فيه أيضًا.','Your account was created. Open the confirmation email, then return here to sign in. Check your spam folder too.'));
+        setTab('account');
+        message(t('تم إنشاء الحساب. أكّد بريدك ثم سجّل الدخول، وسنفتح الصفحة التي طلبتها تلقائيًا.','Account created. Confirm your email and sign in; we will automatically open the page you requested.'));
         return;
       }
       setPendingConfirmationEmail('');
       if(d.user){setUser(d.user);setProfile(v=>({...v,full_name:d.user.user_metadata?.full_name||v.full_name}));}
       const loaded=await loadCustomer({preserveAuthenticatedUser:!!d.user});
       if(!loaded&&!d.user)throw new Error(t('تم تسجيل الدخول لكن تعذر تحميل جلسة الحساب. أعد المحاولة.','Signed in, but the account session could not be loaded. Please retry.'));
-      setTab('account');message(t('تم تسجيل الدخول بنجاح. جميع خدمات الحساب أصبحت متاحة.','Signed in successfully. Account services are now available.'));
+      const destination = returnTab || 'account';
+      setTab(destination);
+      setReturnTab('account');
+      message(destination==='passport' ? t('تم تسجيل الدخول بنجاح. تم فتح جوازك الرقمي تلقائيًا.','Signed in successfully. Your digital passport opened automatically.') : t('تم تسجيل الدخول بنجاح. جميع خدمات الحساب أصبحت متاحة.','Signed in successfully. Account services are now available.'));
     }catch(e){
       if (/email not confirmed/i.test(e.message || '')) {
         message(t('حسابك موجود، لكنه يحتاج تأكيد البريد الإلكتروني قبل تسجيل الدخول. أعد إرسال رسالة التأكيد من الزر أدناه.','Your account exists, but email confirmation is required before sign-in. Resend the confirmation email below.'));
@@ -151,7 +157,7 @@ export default function TravelHub({ lang='ar' }) {
 
   return <section className="travel-hub container" dir={rtl?'rtl':'ltr'}>
     <div className="hub-intro"><div><span className="eyebrow gold-text">VIA LOCAL TRAVEL HUB</span><h1>{t('رحلتك تبدأ من هنا','Your journey starts here')}</h1><p>{t('خطط، احجز، تابع رحلاتك، واجمع ذكرياتك في حساب واحد.','Plan, book, track your trips and collect your memories in one place.')}</p></div><div className="hub-intro-mark"><PlaneTakeoff size={30}/></div></div>
-    <nav className="hub-tabs">{tabs.map(([id,ar,en,Icon])=><button key={id} className={tab===id?'active':''} onClick={()=>{setTab(id);if(id==='passport'&&!user)loadCustomer();}}><Icon size={16}/>{t(ar,en)}</button>)}</nav>
+    <nav className="hub-tabs">{tabs.map(([id,ar,en,Icon])=><button key={id} className={tab===id?'active':''} onClick={()=>{if(id==='passport'&&!user&&!customerLoading){setReturnTab('passport');setAccountMode('signup');setTab('account');message(t('أنشئ حسابك أو سجّل الدخول، وسيُفتح جوازك الرقمي تلقائيًا بعد نجاح الدخول.','Create an account or sign in; your digital passport will open automatically afterward.'));return;}setTab(id);if(id==='passport'&&!user)loadCustomer();}}><Icon size={16}/>{t(ar,en)}</button>)</nav>
     {notice&&<div className="hub-notice"><CheckCircle2 size={17}/>{notice}</div>}
 
     {tab==='planner'&&<div className="hub-card"><div className="hub-card-title"><Compass size={20}/><div><h2>{t('مخطط الرحلات الذكي','Smart trip planner')}</h2><p>{t('أنشئ برنامجًا أوليًا حسب المدينة والمدة واهتماماتك، باستخدام الوجهات المنشورة في الموقع.','Build a starter itinerary using published destinations, your city, trip length and interests.')}</p></div></div>
